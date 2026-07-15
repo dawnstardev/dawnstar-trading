@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0a0c10"/><stop offset="1" stop-color="#0f131a"/></linearGradient>
+ <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4fd1c5"/><stop offset=".55" stop-color="#3987e5"/><stop offset="1" stop-color="#f5b942"/></linearGradient>
+ <radialGradient id="dawn" cx="50%" cy="100%" r="70%"><stop offset="0" stop-color="#f5b942" stop-opacity=".22"/><stop offset="1" stop-color="#f5b942" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1200" height="630" fill="url(#bg)"/>
+<rect width="1200" height="630" fill="url(#dawn)"/>
+<g transform="translate(96,150)">
+ <path d="M40 0 L45 24 L64 12 L52 32 L72 40 L52 48 L64 68 L45 56 L40 80 L35 56 L16 68 L28 48 L8 40 L28 32 L16 12 L35 24 Z" fill="url(#g)"/>
+ <text x="110" y="34" fill="#6b7787" font-family="monospace" font-size="22" letter-spacing="6">DAWNSTAR DEVELOPMENT &amp; PUBLISHING</text>
+ <text x="110" y="86" fill="#f2f5f8" font-family="Segoe UI, sans-serif" font-size="58" font-weight="800">Dawnstar Trading</text>
+</g>
+<text x="96" y="400" fill="#f2f5f8" font-family="Segoe UI, sans-serif" font-size="46" font-weight="700">Automated trading that refuses to</text>
+<text x="96" y="458" fill="#f5b942" font-family="Segoe UI, sans-serif" font-size="46" font-weight="700">let you fool yourself.</text>
+<text x="96" y="536" fill="#aeb7c4" font-family="monospace" font-size="24">Paper-by-default  ·  Non-custodial  ·  No demonstrated edge</text>
+</svg>
