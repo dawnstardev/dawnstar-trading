@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Dawnstar Trading is honest automated-trading software for Windows: professional anti-overfitting rigor, paper-by-default, non-custodial, and an AI that can only ever add caution. By Dawnstar Development & Publishing.">
+<meta name="theme-color" content="#06070a">
+<link rel="canonical" href="https://dawnstardev.com/">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!-- Open Graph / social -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dawnstar Development & Publishing">
+<meta property="og:title" content="Dawnstar Trading — honest automated trading">
+<meta property="og:description" content="Dawnstar Trading is honest automated-trading software for Windows: professional anti-overfitting rigor, paper-by-default, non-custodial, and an AI that can only ever add caution. By Dawnstar Development & Publishing.">
+<meta property="og:url" content="https://dawnstardev.com/">
+<meta property="og:image" content="https://dawnstardev.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dawnstar Trading — honest automated trading">
+<meta name="twitter:description" content="Dawnstar Trading is honest automated-trading software for Windows: professional anti-overfitting rigor, paper-by-default, non-custodial, and an AI that can only ever add caution. By Dawnstar Development & Publishing.">
+<meta name="twitter:image" content="https://dawnstardev.com/og.png">
+<title>Dawnstar Trading — honest automated trading, by Dawnstar Development &amp; Publishing</title>
+<style>
+  :root{
+    /* Deep-space charcoal ground — the product's own "flight-deck for money". */
+    --void:#06070a; --bg-0:#0a0c10; --bg-1:#0f131a; --bg-2:#141922; --bg-3:#1b2230; --bg-inset:#0b0e13;
+    --border:rgba(255,255,255,.07); --border-2:rgba(255,255,255,.12);
+    --ink-0:#f2f5f8; --ink-1:#aeb7c4; --ink-2:#6b7787;
+    /* STAR (cool, primary voice) */
+    --star:#4fd1c5; --blue:#3987e5; --star-soft:rgba(79,209,197,.13);
+    /* DAWN (warm, rare — the rising-horizon beat) */
+    --dawn:#f5b942; --coral:#ff8a5c; --dawn-soft:rgba(245,185,66,.12);
+    --up:#2ecc71; --down:#ff5c5c;
+    --radius:14px; --radius-sm:9px;
+    --shadow:0 18px 50px rgba(0,0,0,.5);
+    --mono:"Cascadia Mono","JetBrains Mono","SFMono-Regular",Consolas,ui-monospace,monospace;
+    --sans:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",sans-serif;
+    --measure:64ch;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{
+    margin:0; background:var(--bg-0); color:var(--ink-1);
+    font-family:var(--sans); font-size:16.5px; line-height:1.65;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--star-soft); color:#fff}
+  a{color:var(--star); text-decoration:none}
+  a:hover{color:#7fe3da}
+  h1,h2,h3{color:var(--ink-0); font-weight:700; line-height:1.1; text-wrap:balance; margin:0}
+  p{margin:0}
+  :focus-visible{outline:2px solid var(--star); outline-offset:3px; border-radius:4px}
+  .wrap{width:min(1120px,92vw); margin-inline:auto}
+  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--star); font-weight:600}
+  .mono{font-family:var(--mono)}
+  .tnum{font-variant-numeric:tabular-nums}
+
+  /* ---------- atmosphere ---------- */
+  #stars{position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:.55}
+  .dawnglow{
+    position:fixed; left:50%; bottom:-38vh; transform:translateX(-50%);
+    width:150vw; height:75vh; z-index:0; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 100%,
+       rgba(245,185,66,.20) 0%, rgba(255,138,92,.10) 26%, rgba(57,135,229,.05) 52%, transparent 70%);
+    filter:blur(6px);
+  }
+  .content{position:relative; z-index:1}
+
+  /* ---------- nav ---------- */
+  header.nav{position:sticky; top:0; z-index:50; backdrop-filter:blur(14px);
+    background:linear-gradient(180deg,rgba(8,10,14,.82),rgba(8,10,14,.5)); border-bottom:1px solid var(--border)}
+  .nav-in{display:flex; align-items:center; gap:22px; padding:13px 0}
+  .brand{display:flex; align-items:center; gap:11px; margin-right:auto}
+  .brand .star{width:26px; height:26px; filter:drop-shadow(0 0 9px rgba(79,209,197,.5))}
+  .brand b{color:var(--ink-0); font-weight:800; letter-spacing:.16em; font-size:15px; font-family:var(--mono)}
+  .brand small{display:block; color:var(--ink-2); font-size:9.5px; letter-spacing:.2em; font-family:var(--mono); text-transform:uppercase; margin-top:1px}
+  .nav a.link{color:var(--ink-1); font-size:14px; font-family:var(--mono); letter-spacing:.04em}
+  .nav a.link:hover{color:var(--ink-0)}
+  .nav-links{display:flex; gap:22px; align-items:center}
+  .btn{display:inline-flex; align-items:center; gap:9px; font-family:var(--mono); font-weight:600; font-size:14px;
+    letter-spacing:.03em; padding:11px 18px; border-radius:var(--radius-sm); border:1px solid transparent; cursor:pointer; transition:transform .15s ease, box-shadow .2s ease, background .2s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-primary{background:linear-gradient(135deg,var(--star),var(--blue)); color:#04121a; box-shadow:0 8px 22px rgba(79,209,197,.22)}
+  .btn-primary:hover{color:#04121a; box-shadow:0 12px 30px rgba(79,209,197,.34)}
+  .btn-ghost{background:transparent; border-color:var(--border-2); color:var(--ink-0)}
+  .btn-ghost:hover{color:var(--ink-0); border-color:var(--star); background:var(--star-soft)}
+  .btn-lg{padding:15px 26px; font-size:15px}
+  .navtoggle{display:none; background:none; border:1px solid var(--border-2); color:var(--ink-0); border-radius:8px; padding:7px 10px; font-size:16px}
+
+  /* ---------- section rhythm ---------- */
+  section{padding:96px 0}
+  .sec-head{max-width:var(--measure)}
+  .sec-head h2{font-size:clamp(28px,4vw,42px); margin:14px 0 0}
+  .sec-head p.lead{color:var(--ink-1); font-size:18px; margin-top:16px}
+  .divider{height:1px; background:linear-gradient(90deg,transparent,var(--border-2),transparent)}
+
+  /* ---------- hero ---------- */
+  .hero{padding:clamp(70px,11vw,140px) 0 92px; text-align:center}
+  .hero .heromark{width:64px; height:64px; margin:0 auto 26px; filter:drop-shadow(0 0 22px rgba(245,185,66,.4))}
+  .hero h1{font-size:clamp(34px,6.2vw,68px); letter-spacing:-.02em; max-width:16ch; margin-inline:auto}
+  .hero h1 .g{background:linear-gradient(120deg,var(--dawn),var(--coral)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
+  .hero p.sub{font-size:clamp(17px,2.3vw,21px); color:var(--ink-1); max-width:56ch; margin:24px auto 0}
+  .hero .cta{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:36px}
+  .chips{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:34px}
+  .chip{font-family:var(--mono); font-size:12.5px; letter-spacing:.03em; color:var(--ink-1);
+    border:1px solid var(--border-2); border-radius:100px; padding:7px 15px; background:rgba(255,255,255,.02)}
+  .chip b{color:var(--star); font-weight:600}
+  .chip.dawn b{color:var(--dawn)}
+
+  /* ---------- mission ---------- */
+  .mission{border:1px solid var(--border-2); border-radius:var(--radius); background:linear-gradient(180deg,var(--bg-2),var(--bg-1));
+    padding:clamp(30px,5vw,56px); position:relative; overflow:hidden}
+  .mission::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg,var(--star),var(--blue))}
+  .mission .eyebrow{color:var(--dawn)}
+  .mission blockquote{margin:18px 0 0; font-size:clamp(21px,3vw,30px); line-height:1.4; color:var(--ink-0); font-weight:600; max-width:26ch}
+  .mission blockquote .g{color:var(--dawn)}
+  .mission p.after{margin-top:22px; max-width:var(--measure); color:var(--ink-1)}
+
+  /* ---------- honesty pledge ---------- */
+  .pledge-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin-top:44px}
+  .pledge{border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-2); padding:24px; position:relative}
+  .pledge:hover{border-color:var(--border-2)}
+  .pledge .n{font-family:var(--mono); font-size:12px; color:var(--star); letter-spacing:.12em}
+  .pledge h3{font-size:18px; margin:12px 0 8px}
+  .pledge p{font-size:14.5px; color:var(--ink-1); line-height:1.6}
+  .pledge .k{color:var(--ink-0); font-weight:600}
+
+  /* ---------- feature grid ---------- */
+  .features{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; margin-top:44px}
+  .feature{border:1px solid var(--border); border-radius:var(--radius); background:linear-gradient(180deg,var(--bg-2),var(--bg-1)); padding:26px; transition:transform .18s ease, border-color .2s}
+  .feature:hover{transform:translateY(-3px); border-color:var(--border-2)}
+  .feature .ic{width:40px; height:40px; border-radius:10px; display:grid; place-items:center; margin-bottom:16px; background:var(--star-soft); border:1px solid rgba(79,209,197,.25)}
+  .feature .ic svg{width:22px; height:22px; stroke:var(--star); fill:none; stroke-width:1.7}
+  .feature.dawn .ic{background:var(--dawn-soft); border-color:rgba(245,185,66,.28)}
+  .feature.dawn .ic svg{stroke:var(--dawn)}
+  .feature h3{font-size:19px; margin-bottom:9px}
+  .feature p{font-size:14.5px; color:var(--ink-1); line-height:1.62}
+  .feature .tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:14px}
+  .feature .tag{font-family:var(--mono); font-size:11px; color:var(--ink-2); border:1px solid var(--border); border-radius:6px; padding:3px 8px; letter-spacing:.02em}
+
+  /* ---------- path to live (numbered = real sequence) ---------- */
+  .path{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:0; margin-top:44px; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden}
+  .step{padding:26px; border-right:1px solid var(--border); background:var(--bg-1)}
+  .step:last-child{border-right:none}
+  .step .num{font-family:var(--mono); font-size:34px; font-weight:700; letter-spacing:-.03em; color:var(--bg-3); -webkit-text-stroke:1px var(--star); line-height:1}
+  .step:nth-child(4) .num{-webkit-text-stroke-color:var(--dawn)}
+  .step h3{font-size:16px; margin:16px 0 8px}
+  .step p{font-size:13.5px; color:var(--ink-1); line-height:1.55}
+  .step .lbl{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2); margin-top:12px; display:block}
+
+  /* ---------- download ---------- */
+  .download{border:1px solid var(--border-2); border-radius:var(--radius); background:
+      radial-gradient(120% 140% at 50% 0%, rgba(57,135,229,.10), transparent 60%), var(--bg-1); padding:clamp(30px,5vw,56px); text-align:center}
+  .download h2{font-size:clamp(26px,3.6vw,38px)}
+  .dl-meta{display:flex; gap:10px 26px; justify-content:center; flex-wrap:wrap; margin-top:22px; font-family:var(--mono); font-size:13px; color:var(--ink-1)}
+  .dl-meta b{color:var(--ink-0)}
+  .dl-note{margin:26px auto 0; max-width:66ch; border:1px solid rgba(250,178,25,.28); background:var(--dawn-soft); border-radius:var(--radius-sm); padding:16px 20px; text-align:left; color:var(--ink-1); font-size:14px}
+  .dl-note b{color:var(--dawn)}
+  .hash{font-family:var(--mono); font-size:11.5px; color:var(--ink-2); word-break:break-all; background:var(--bg-inset); border:1px solid var(--border); border-radius:8px; padding:9px 12px; margin-top:12px; display:block}
+
+  /* ---------- about + faq ---------- */
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start}
+  .faq details{border-bottom:1px solid var(--border); padding:18px 0}
+  .faq summary{cursor:pointer; list-style:none; font-weight:600; color:var(--ink-0); font-size:16.5px; display:flex; justify-content:space-between; gap:16px}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+"; font-family:var(--mono); color:var(--star); font-size:20px; line-height:1}
+  .faq details[open] summary::after{content:"–"}
+  .faq p{margin-top:12px; color:var(--ink-1); font-size:15px; max-width:var(--measure)}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--border); padding:56px 0 40px; margin-top:40px}
+  .foot-top{display:flex; justify-content:space-between; gap:30px; flex-wrap:wrap}
+  .foot-brand{max-width:38ch}
+  .foot-brand .brand{margin-bottom:14px}
+  .foot-cols{display:flex; gap:60px; flex-wrap:wrap}
+  .foot-col h4{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-2); margin:0 0 14px}
+  .foot-col a{display:block; color:var(--ink-1); font-size:14px; margin-bottom:9px}
+  .foot-col a:hover{color:var(--star)}
+  .legal{margin-top:44px; padding-top:24px; border-top:1px solid var(--border); color:var(--ink-2); font-size:12.5px; line-height:1.7; max-width:none}
+  .legal strong{color:var(--ink-1)}
+
+  @media (max-width:820px){
+    .nav-links{display:none}
+    .navtoggle{display:inline-block}
+    .nav-links.open{display:flex; position:absolute; top:60px; right:4vw; flex-direction:column; align-items:flex-start; gap:16px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:12px; padding:20px 22px; box-shadow:var(--shadow)}
+    .two{grid-template-columns:1fr; gap:26px}
+    .step{border-right:none; border-bottom:1px solid var(--border)}
+    section{padding:72px 0}
+  }
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="dawnglow" aria-hidden="true"></div>
+
+<div class="content">
+  <!-- shared star symbol -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <linearGradient id="dg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4fd1c5"/><stop offset=".55" stop-color="#3987e5"/><stop offset="1" stop-color="#f5b942"/>
+    </linearGradient>
+    <symbol id="star" viewBox="0 0 32 32"><path d="M16 1 L18.1 10.9 L26.6 5.4 L21.1 13.9 L31 16 L21.1 18.1 L26.6 26.6 L18.1 21.1 L16 31 L13.9 21.1 L5.4 26.6 L10.9 18.1 L1 16 L10.9 13.9 L5.4 5.4 L13.9 10.9 Z" fill="url(#dg)"/></symbol>
+  </defs></svg>
+
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a class="brand" href="#top" aria-label="Dawnstar home">
+        <svg class="star" viewBox="0 0 32 32"><use href="#star"/></svg>
+        <span><b>DAWNSTAR</b><small>Development &amp; Publishing</small></span>
+      </a>
+      <nav class="nav-links" id="navlinks">
+        <a class="link" href="#product">Product</a>
+        <a class="link" href="#rigor">Rigor</a>
+        <a class="link" href="#honesty">Honesty</a>
+        <a class="link" href="#about">About</a>
+        <a class="btn btn-primary" href="#download">Download</a>
+      </nav>
+      <button class="navtoggle" id="navtoggle" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </header>
+
+  <a id="top"></a>
+
+  <!-- ================= HERO ================= -->
+  <div class="hero wrap">
+    <svg class="heromark" viewBox="0 0 32 32" aria-hidden="true"><use href="#star"/></svg>
+    <div class="eyebrow" style="margin-bottom:20px">Dawnstar Development &amp; Publishing</div>
+    <h1>Automated trading that <span class="g">refuses to let you fool yourself.</span></h1>
+    <p class="sub">Most trading software sells a pretty backtest. Dawnstar is built to do the opposite — bake professional anti-overfitting rigor into the core and show you, plainly, when an “edge” isn’t real. Paper-by-default. Non-custodial. Yours to run.</p>
+    <div class="cta">
+      <a class="btn btn-primary btn-lg" href="#download">↓ Download for Windows</a>
+      <a class="btn btn-ghost btn-lg" href="#honesty">Read our honesty policy</a>
+    </div>
+    <div class="chips">
+      <span class="chip">Paper-trading by <b>default</b></span>
+      <span class="chip">Non-custodial — <b>never holds your money</b></span>
+      <span class="chip dawn">No demonstrated <b>edge</b></span>
+      <span class="chip">Your keys, <b>encrypted &amp; local</b></span>
+    </div>
+  </div>
+
+  <!-- ================= MISSION ================= -->
+  <section id="mission"><div class="wrap">
+    <div class="mission">
+      <div class="eyebrow">Our mission</div>
+      <blockquote>Give independent traders <span class="g">institutional-grade honesty</span> — the tools to tell a real edge from noise, and the discipline to act only on the difference.</blockquote>
+      <p class="after">The trading-software industry runs on hope: an up-and-to-the-right equity curve, a number with no error bars, a strategy that quietly falls apart the moment real money touches it. Dawnstar Development &amp; Publishing exists to build the counterweight — software that measures its own uncertainty out loud, defaults to safe, and never asks you to trust a claim it can’t show. We would rather tell you “this isn’t real” than sell you a dream.</p>
+    </div>
+  </div></section>
+
+  <!-- ================= HONESTY POLICY ================= -->
+  <section id="honesty"><div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Honesty &amp; integrity policy</div>
+      <h2>Six promises we build into the code — not just the copy.</h2>
+      <p class="lead">These aren’t a marketing stance we can quietly walk back. Each one is enforced by how the software is architected, and every claim on this page is one we can demonstrate.</p>
+    </div>
+    <div class="pledge-grid">
+      <div class="pledge"><div class="n">01</div><h3>We never overstate an edge</h3><p>Dawnstar surfaces the <span class="k">Deflated Sharpe Ratio</span>, the <span class="k">Probability of Backtest Overfitting</span>, walk-forward efficiency and Monte-Carlo bands on every result — even when the honest answer is “this is noise dressed as edge.” The whole system currently has <span class="k">no demonstrated edge</span>, and we say so everywhere it matters.</p></div>
+      <div class="pledge"><div class="n">02</div><h3>Paper-trading by default</h3><p>Out of the box it trades a simulated account. Real money requires <span class="k">two independent, deliberate gates</span> plus your own live broker keys — there is no single switch that flips everything to real money by accident.</p></div>
+      <div class="pledge"><div class="n">03</div><h3>Non-custodial, always</h3><p>Dawnstar is not a wallet, bank, or money transmitter. It <span class="k">never holds, receives, or moves your funds</span>. Your money stays at the regulated brokers you connect; Dawnstar only sends orders through their official APIs with keys you control and can revoke.</p></div>
+      <div class="pledge"><div class="n">04</div><h3>The AI can only add caution</h3><p>The built-in AI is a paid skeptic. Structurally, it <span class="k">cannot touch the trade path</span> — it produces language, never decisions — and it refuses personalized advice or price predictions. It only ever argues for <span class="k">more</span> caution, never less.</p></div>
+      <div class="pledge"><div class="n">05</div><h3>Your keys stay yours</h3><p>Broker credentials are sealed in a local encrypted vault (<span class="k">Argon2id + AES-256-GCM</span>, bound to your Windows account) and never leave your machine. We have no server that could see them, because there is no server.</p></div>
+      <div class="pledge"><div class="n">06</div><h3>Not financial advice</h3><p>Dawnstar is a tool, not an adviser. Nothing it or this site shows is a recommendation to buy or sell anything, and <span class="k">past or backtested results never guarantee future results</span>. You are responsible for every order it places on your behalf.</p></div>
+    </div>
+  </div></section>
+
+  <div class="wrap"><div class="divider"></div></div>
+
+  <!-- ================= PRODUCT ================= -->
+  <section id="product"><div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">What Dawnstar Trading is</div>
+      <h2>A complete, honest automated-trading workstation for your own desktop.</h2>
+      <p class="lead">One native Windows app. It scores strategies with real statistics, connects to your brokers, and can run trading cycles on a schedule — with every safeguard on by default.</p>
+    </div>
+    <div class="features">
+      <div class="feature dawn" id="rigor">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 4 4-8"/></svg></div>
+        <h3>The Rigor Engine</h3>
+        <p>The heart of Dawnstar. Probabilistic &amp; Deflated Sharpe Ratios (Bailey &amp; López de Prado), an empirical Probability of Backtest Overfitting via CSCV, walk-forward efficiency, and Monte-Carlo confidence bands — computed by the same C++ engine that trades live, so results match what actually runs.</p>
+        <div class="tags"><span class="tag">Deflated Sharpe</span><span class="tag">PBO / CSCV</span><span class="tag">Walk-forward</span><span class="tag">Monte Carlo</span></div>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></div>
+        <h3>The AI Skeptic &amp; chat</h3>
+        <p>An advisory-only assistant that critiques your backtests for overfitting and explains the statistics in plain English. It works fully offline as a heuristic, or with your own API key for a written adversarial review. It can only ever lower your confidence — never green-light a trade.</p>
+        <div class="tags"><span class="tag">Advisory only</span><span class="tag">Offline capable</span><span class="tag">Never trades</span></div>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+        <h3>Encrypted vault</h3>
+        <p>Broker keys are stretched with Argon2id and sealed with AES-256-GCM, DPAPI-bound to your Windows account and wiped from memory on lock or idle. One-click backup, and an honest reminder: there is no password recovery, by design.</p>
+        <div class="tags"><span class="tag">Argon2id</span><span class="tag">AES-256-GCM</span><span class="tag">Local only</span></div>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></div>
+        <h3>Broker connections</h3>
+        <p>US equities via Alpaca and forex via OANDA, through their official APIs — paper/practice by default. Coinbase is on the roadmap. We’re candid about limits too: there’s no supported Robinhood integration, because it would mean violating their terms.</p>
+        <div class="tags"><span class="tag">Alpaca</span><span class="tag">OANDA</span><span class="tag">Coinbase (roadmap)</span></div>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h3>Risk-first execution</h3>
+        <p>Position and exposure caps, a daily-loss halt, a pattern-day-trader guard, an always-available kill switch, and idempotent order handling so a network blip can never double-fire a trade. Exits and de-risking are never blocked.</p>
+        <div class="tags"><span class="tag">Kill switch</span><span class="tag">PDT guard</span><span class="tag">Idempotent</span></div>
+      </div>
+      <div class="feature dawn">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
+        <h3>Backtest = live, one engine</h3>
+        <p>The same code path runs your backtest and your live orders, so there’s no “it worked in the sim” gap. Every shipped binary is inventoried with a published SHA-256, and the build is open and documented — verify what you run.</p>
+        <div class="tags"><span class="tag">One code path</span><span class="tag">Reproducible</span><span class="tag">Hash-verified</span></div>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- ================= PATH TO LIVE ================= -->
+  <section><div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">The path to real money</div>
+      <h2>Deliberately slow, in the order that keeps you safe.</h2>
+      <p class="lead">Dawnstar makes going live take real, conscious steps — because the point isn’t to trade fast, it’s to trade only what you’ve actually validated.</p>
+    </div>
+    <div class="path">
+      <div class="step"><div class="num">1</div><h3>Backtest with rigor</h3><p>Run your strategy and read the scorecard like an allocator — if the Deflated Sharpe and PBO say it’s a curve-fit, stop here.</p><span class="lbl">No money</span></div>
+      <div class="step"><div class="num">2</div><h3>Paper-trade for weeks</h3><p>Watch it run live-shaped on a simulated account. This is the point, not a formality — most strategies fail here.</p><span class="lbl">Simulated</span></div>
+      <div class="step"><div class="num">3</div><h3>Arm gate one</h3><p>Deliberately enable live mode. Nothing happens yet — it’s one of two independent locks, each requiring a fresh confirmation.</p><span class="lbl">Gate 1 of 2</span></div>
+      <div class="step"><div class="num">4</div><h3>Arm gate two + live keys</h3><p>Acknowledge the risk file and supply live broker keys. Only now can real orders be placed — with every risk cap still on.</p><span class="lbl">Real money</span></div>
+    </div>
+  </div></section>
+
+  <!-- ================= DOWNLOAD ================= -->
+  <section id="download"><div class="wrap">
+    <div class="download">
+      <div class="eyebrow" style="color:var(--dawn)">Download</div>
+      <h2>Get Dawnstar Trading for Windows</h2>
+      <p style="max-width:52ch; margin:16px auto 0; color:var(--ink-1)">A single desktop app. Installs alongside its documented engine; your data, keys, and trades stay on your machine.</p>
+      <div class="cta" style="justify-content:center; margin-top:30px">
+        <a class="btn btn-primary btn-lg" id="dlbtn" href="https://github.com/dawnstardev/dawnstar-trading/releases/latest/download/Dawnstar-Setup.exe" rel="noopener">↓ Download Dawnstar 2.1.0</a>
+        <a class="btn btn-ghost btn-lg" href="#faq">How to verify &amp; install</a>
+      </div>
+      <div class="dl-meta">
+        <span>Version <b>2.1.0</b></span><span>Windows <b>10 / 11 · 64-bit</b></span><span>~<b>22&nbsp;MB</b></span><span><b>Free</b></span>
+      </div>
+      <div class="dl-note">
+        <b>Honest heads-up:</b> this build isn’t yet signed with a publicly-trusted certificate, so Windows SmartScreen may show an “unknown publisher” notice on first launch. That’s expected for a small independent publisher pre-certificate — not a sign of tampering. Before you run it, verify the download against the published <b>SHA-256</b> (the honest substitute for a signature), then choose “More info → Run anyway.” A publicly-trusted signing certificate is on our roadmap.
+        <span class="hash" id="hash">SHA-256 &nbsp;·&nbsp; published with each release on the download page</span>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- ================= ABOUT + FAQ ================= -->
+  <section id="about"><div class="wrap two">
+    <div>
+      <div class="eyebrow">About the publisher</div>
+      <h2 style="font-size:clamp(26px,3.4vw,36px); margin-top:12px">Dawnstar Development &amp; Publishing</h2>
+      <p style="margin-top:18px; color:var(--ink-1)">We’re an independent software studio building tools for people who’d rather see the truth than a sales pitch. Dawnstar Trading is our flagship — but the standard behind it is the whole company: measure uncertainty out loud, default to safe, hold user data at arm’s length, and never ship a claim we can’t demonstrate.</p>
+      <p style="margin-top:16px; color:var(--ink-1)">“Dawnstar” is the morning star — the light that shows up at the edge of dawn. It’s the promise we build toward: clarity where the rest of the category sells fog.</p>
+      <div class="chips" style="justify-content:flex-start; margin-top:26px">
+        <span class="chip">Independent</span><span class="chip">Privacy-respecting</span><span class="chip dawn">Honesty-first</span>
+      </div>
+    </div>
+    <div class="faq" id="faq">
+      <div class="eyebrow" style="margin-bottom:18px">Straight answers</div>
+      <details open><summary>Will this make me money?</summary><p>We won’t pretend to know. Dawnstar has <strong>no demonstrated edge</strong> — it’s a tool for testing and running strategies honestly, not a promise of profit. Trading carries a real risk of loss. Anyone who guarantees returns is the exact thing this product exists to warn you about.</p></details>
+      <details><summary>Do you ever hold or move my money?</summary><p>Never. Dawnstar is <strong>non-custodial</strong> — not a wallet or money transmitter. Your funds stay at the regulated brokers you connect. It only sends orders through their official APIs using keys you control and can revoke at any time.</p></details>
+      <details><summary>Why does Windows warn about the download?</summary><p>The build isn’t yet signed with a publicly-trusted certificate, so SmartScreen flags an “unknown publisher.” That’s normal for an independent pre-certificate release and doesn’t mean the file is unsafe. Confirm it wasn’t altered by checking its SHA-256 against the value on the release page — in PowerShell: <span class="mono">Get-FileHash .\Dawnstar-Setup.exe -Algorithm SHA256</span> — then choose “More info → Run anyway.” A publicly-trusted certificate is on our roadmap.</p></details>
+      <details><summary>Is my data private?</summary><p>Yes. There is no Dawnstar server. Everything — your keys, strategies, and trade history — lives on your own machine in an encrypted vault. We can’t see it because it never reaches us.</p></details>
+      <details><summary>Which brokers are supported?</summary><p>US equities through <strong>Alpaca</strong> and forex through <strong>OANDA</strong>, paper/practice by default. Coinbase is on the roadmap. Robinhood is not supported, because there’s no official API that would let us do it within their terms — and we won’t pretend otherwise.</p></details>
+      <details><summary>Is this financial advice?</summary><p>No. Dawnstar is software, not an investment adviser, broker-dealer, or fiduciary. Nothing it outputs is a recommendation, and you’re responsible for every order it places. Read the full disclaimer before connecting a broker.</p></details>
+    </div>
+  </div></section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer><div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand" href="#top"><svg class="star" viewBox="0 0 32 32" style="width:24px;height:24px"><use href="#star"/></svg><span><b>DAWNSTAR</b><small>Development &amp; Publishing</small></span></a>
+        <p style="font-size:14px; color:var(--ink-2)">Honest automated trading, built to stop you fooling yourself.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col"><h4>Product</h4><a href="#product">Overview</a><a href="#rigor">Rigor Engine</a><a href="#download">Download</a><a href="#faq">FAQ</a></div>
+        <div class="foot-col"><h4>Company</h4><a href="#mission">Mission</a><a href="#honesty">Honesty policy</a><a href="#about">About</a></div>
+        <div class="foot-col"><h4>Legal</h4><a href="/disclaimer.html">Risk &amp; disclosures</a><a href="/privacy.html">Privacy policy</a><a href="/terms.html">Terms of use</a></div>
+      </div>
+    </div>
+    <p class="legal">
+      <strong>Risk &amp; disclaimer.</strong> Dawnstar Trading is software provided by Dawnstar Development &amp; Publishing. It is <strong>not</strong> an investment adviser, broker-dealer, money transmitter, or fiduciary, and nothing here or in the app is financial, investment, tax, or legal advice or a recommendation to buy or sell any instrument. Automated and discretionary trading both carry a substantial <strong>risk of loss</strong>, potentially all of the capital you deploy. <strong>Past, backtested, simulated, and hypothetical results never guarantee future results</strong>, and no edge is demonstrated. Dawnstar is non-custodial and never holds or moves your funds; your accounts remain at the regulated brokers you connect. You are solely responsible for every order placed on your behalf and for deciding whether to trade at all. Named third parties (Alpaca, OANDA, Coinbase, and others) are independent and not affiliated with or endorsing Dawnstar. Use entirely at your own risk.
+      <br><br>© <span id="yr">2026</span> Dawnstar Development &amp; Publishing. All rights reserved.
+    </p>
+  </div></footer>
+</div>
+
+<script>
+(function(){
+  // year
+  var yr=document.getElementById('yr'); if(yr) yr.textContent=new Date().getFullYear();
+  // mobile nav
+  var t=document.getElementById('navtoggle'), l=document.getElementById('navlinks');
+  if(t&&l){ t.addEventListener('click',function(){ var o=l.classList.toggle('open'); t.setAttribute('aria-expanded',o); });
+    l.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){l.classList.remove('open');t.setAttribute('aria-expanded',false);});}); }
+
+  // starfield — quiet, static unless motion is welcome
+  var c=document.getElementById('stars'); if(!c) return;
+  var ctx=c.getContext('2d'), stars=[], DPR=Math.min(window.devicePixelRatio||1,2), reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function size(){ c.width=innerWidth*DPR; c.height=innerHeight*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); build(); }
+  function build(){ stars=[]; var n=Math.min(150,Math.round(innerWidth*innerHeight/12000));
+    for(var i=0;i<n;i++){ stars.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.3+.2,a:Math.random()*.5+.2,tw:Math.random()*.02+.004,ph:Math.random()*6.28}); } }
+  function frame(ts){ ctx.clearRect(0,0,innerWidth,innerHeight);
+    for(var i=0;i<stars.length;i++){ var s=stars[i]; var al=reduce? s.a : s.a+Math.sin(ts*s.tw+s.ph)*.18;
+      ctx.beginPath(); ctx.fillStyle='rgba(180,205,225,'+Math.max(0,al)+')'; ctx.arc(s.x,s.y,s.r,0,6.283); ctx.fill(); }
+    if(!reduce) requestAnimationFrame(frame); }
+  size(); requestAnimationFrame(frame);
+  var rt; addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(size,200); });
+})();
+</script>
+
+</body>
+</html>
