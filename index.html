@@ -226,724 +226,230 @@
 </style>
 </head>
 <body>
-  <!-- shared SVG defs: the Dawnstar star gradient (star teal -> dawn gold) -->
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="dawnglow" aria-hidden="true"></div>
+
+<div class="content">
+  <!-- shared star symbol -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-    <linearGradient id="dstarGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7cf0e6"/>
-      <stop offset="0.55" stop-color="#4fd1c5"/>
-      <stop offset="1" stop-color="#f5b942"/>
-    </linearGradient>
     <linearGradient id="dg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#4fd1c5"/><stop offset="1" stop-color="#3987e5"/>
+      <stop offset="0" stop-color="#4fd1c5"/><stop offset=".55" stop-color="#3987e5"/><stop offset="1" stop-color="#f5b942"/>
     </linearGradient>
+    <symbol id="star" viewBox="0 0 32 32"><path d="M16 1 L18.1 10.9 L26.6 5.4 L21.1 13.9 L31 16 L21.1 18.1 L26.6 26.6 L18.1 21.1 L16 31 L13.9 21.1 L5.4 26.6 L10.9 18.1 L1 16 L10.9 13.9 L5.4 5.4 L13.9 10.9 Z" fill="url(#dg)"/></symbol>
   </defs></svg>
 
-  <!-- ===================== GATE (splash → onboarding / unlock) ===================== -->
-  <div id="gate" class="gate" style="display:none">
-    <div class="starfield"></div>
-    <div class="gate-card">
-      <svg class="dstar gate-star" viewBox="0 0 32 32" aria-hidden="true">
-        <path d="M16 1 L18.1 10.9 L26.6 5.4 L21.1 13.9 L31 16 L21.1 18.1 L26.6 26.6 L18.1 21.1 L16 31 L13.9 21.1 L5.4 26.6 L10.9 18.1 L1 16 L10.9 13.9 L5.4 5.4 L13.9 10.9 Z"/>
-      </svg>
-      <div class="gate-wordmark">DAWNSTAR</div>
-      <div class="gate-tagline">Honest automated trading</div>
-
-      <!-- first-run: create master password -->
-      <div id="gateCreate" style="display:none">
-        <div class="gate-title">Secure your vault</div>
-        <div class="gate-sub">Set a master password. It encrypts your broker keys with a memory-hard local vault (Argon2id + AES-256-GCM) — the same class of design password managers like Bitwarden use. Nothing leaves your machine.</div>
-        <div class="gate-form">
-          <input id="gcPw" class="input" type="password" placeholder="Master password" autocomplete="new-password" />
-          <div class="pw-strength"><span id="gcMeter"></span></div>
-          <div class="pw-hint" id="gcHint">At least 8 characters. Longer is stronger.</div>
-          <input id="gcPw2" class="input" type="password" placeholder="Confirm master password" autocomplete="new-password" />
-          <div class="gate-warn">There is no recovery. If you forget this password, your stored keys are unrecoverable — this is not a server login. Keep it safe.</div>
-          <label class="gate-consent"><input id="gcConsent" type="checkbox" /> <span>I have read and accept the <a href="#" id="gcTermsLink">Risk Disclaimer &amp; Terms</a>. I understand trading risks real money, that no edge is demonstrated, and that past or backtested results never guarantee future results.</span></label>
-          <button id="gcBtn" class="btn btn-primary gate-btn" disabled>Create Vault &amp; Enter →</button>
-          <div id="gcMsg" class="gate-msg"></div>
-        </div>
-      </div>
-
-      <!-- return: unlock -->
-      <div id="gateUnlock" style="display:none">
-        <div class="gate-title">Welcome back</div>
-        <div class="gate-sub">Unlock your encrypted vault to continue.</div>
-        <div class="gate-form">
-          <input id="guPw" class="input" type="password" placeholder="Master password" autocomplete="current-password" />
-          <button id="guBtn" class="btn btn-primary gate-btn">Unlock →</button>
-          <div id="guMsg" class="gate-msg"></div>
-        </div>
-      </div>
-
-      <div class="gate-foot">Paper / practice by default. Real money needs two deliberate gates. No demonstrated edge is ever implied.</div>
-    </div>
-  </div>
-
-  <div id="app" style="display:none">
-    <div class="starfield" aria-hidden="true"></div>
-    <!-- ===================== SIDEBAR ===================== -->
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
-          <svg class="dstar" viewBox="0 0 32 32" width="28" height="28">
-            <path d="M16 1 L18.1 10.9 L26.6 5.4 L21.1 13.9 L31 16 L21.1 18.1 L26.6 26.6 L18.1 21.1 L16 31 L13.9 21.1 L5.4 26.6 L10.9 18.1 L1 16 L10.9 13.9 L5.4 5.4 L13.9 10.9 Z"/>
-          </svg>
-        </div>
-        <div class="brand-text">
-          <div class="brand-name">DAWNSTAR</div>
-          <div class="brand-sub">Trading Terminal</div>
-        </div>
-      </div>
-
-      <nav class="nav">
-        <div class="nav-section">Monitor</div>
-        <button class="nav-item active" data-view="dashboard">
-          <span class="nav-ico">▤</span><span>Dashboard</span>
-        </button>
-        <button class="nav-item" data-view="positions">
-          <span class="nav-ico">▦</span><span>Positions</span>
-        </button>
-        <button class="nav-item" data-view="performance">
-          <span class="nav-ico">↗</span><span>Performance</span>
-        </button>
-
-        <div class="nav-section">Strategy</div>
-        <button class="nav-item" data-view="portfolio">
-          <span class="nav-ico">◎</span><span>Portfolio</span>
-        </button>
-        <button class="nav-item" data-view="backtest">
-          <span class="nav-ico">◔</span><span>Backtest</span>
-        </button>
-        <button class="nav-item" data-view="traders">
-          <span class="nav-ico">◈</span><span>Trader Scoring</span>
-        </button>
-
-        <div class="nav-section">Accounts</div>
-        <button class="nav-item" data-view="connections">
-          <span class="nav-ico">⬡</span><span>Connections</span>
-        </button>
-        <button class="nav-item" data-view="funding">
-          <span class="nav-ico">◇</span><span>Funding</span>
-        </button>
-
-        <div class="nav-sep"></div>
-        <button class="nav-item" data-view="guide">
-          <span class="nav-ico">❖</span><span>User Guide</span>
-        </button>
-        <button class="nav-item" data-view="logs">
-          <span class="nav-ico">≣</span><span>Activity Log</span>
-        </button>
-        <button class="nav-item" data-view="settings">
-          <span class="nav-ico">⚙</span><span>Settings</span>
-        </button>
+  <header class="nav">
+    <div class="wrap nav-in">
+      <a class="brand" href="#top" aria-label="Dawnstar home">
+        <svg class="star" viewBox="0 0 32 32"><use href="#star"/></svg>
+        <span><b>DAWNSTAR</b><small>Development &amp; Publishing</small></span>
+      </a>
+      <nav class="nav-links" id="navlinks">
+        <a class="link" href="#product">Product</a>
+        <a class="link" href="#rigor">Rigor</a>
+        <a class="link" href="#honesty">Honesty</a>
+        <a class="link" href="#about">About</a>
+        <a class="btn btn-primary" href="#download">Download</a>
       </nav>
-
-      <div class="sidebar-foot">
-        <div class="killrow">
-          <button id="killBtn" class="kill-btn" title="Halt all trading immediately">
-            <span class="kill-dot"></span> KILL SWITCH
-          </button>
-        </div>
-        <button id="lockBtn" class="lock-btn" title="Lock the vault (secrets leave memory)">🔒 Lock Vault</button>
-        <div class="root-path" id="rootPath">—</div>
-        <div class="root-path" id="appVersion" title="App version — include this when reporting an issue">—</div>
-      </div>
-    </aside>
-
-    <!-- ===================== MAIN ===================== -->
-    <main class="main">
-      <!-- Top bar -->
-      <header class="topbar">
-        <div class="topbar-left">
-          <h1 id="viewTitle">Dashboard</h1>
-          <span id="modeBadge" class="badge badge-paper">PAPER</span>
-        </div>
-        <div class="topbar-right">
-          <div class="statuschips">
-            <div class="chip" id="marketChip"><span class="dot"></span><span class="chip-label">Market</span></div>
-            <div class="chip" id="alpacaChip"><span class="dot"></span><span class="chip-label">Alpaca</span></div>
-            <div class="chip" id="oandaChip"><span class="dot"></span><span class="chip-label">OANDA</span></div>
-          </div>
-          <button id="runBtn" class="btn btn-primary">
-            <span class="btn-ico">▶</span> Run Cycle
-          </button>
-          <button id="dryRunBtn" class="btn btn-ghost" title="Evaluate signals, place no orders">Dry Run</button>
-        </div>
-      </header>
-
-      <div id="sysWarn" class="syswarn" role="alert" style="display:none"></div>
-
-      <div class="content" id="content">
-
-        <!-- ============ DASHBOARD ============ -->
-        <section class="view active" id="view-dashboard">
-          <div class="onboard" id="onboard" style="display:none">
-            <div class="onboard-icon">◆</div>
-            <div class="onboard-text">
-              <div class="onboard-title">Welcome to Dawnstar</div>
-              <div class="onboard-sub">You're in <strong>paper / practice</strong> mode. Connect your Alpaca paper and OANDA practice accounts to start — no real money is ever at risk until you deliberately arm both live gates.</div>
-            </div>
-            <button class="btn btn-primary" id="onboardBtn">Set Up Accounts →</button>
-          </div>
-          <div class="kpi-row" id="kpiRow">
-            <!-- KPI tiles injected -->
-          </div>
-
-          <div class="grid-2">
-            <div class="panel">
-              <div class="panel-head">
-                <h2>Strategy Status</h2>
-                <span class="panel-sub" id="cycleTime">—</span>
-              </div>
-              <div class="panel-body" id="strategyStatus">
-                <div class="empty">Loading…</div>
-              </div>
-            </div>
-
-            <div class="panel">
-              <div class="panel-head">
-                <h2>Account Snapshot</h2>
-              </div>
-              <div class="panel-body" id="accountSnapshot">
-                <div class="empty">Loading…</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <h2>Recent Activity</h2>
-              <span class="panel-sub">Intent ledger — every order the engine acted on</span>
-            </div>
-            <div class="panel-body no-pad">
-              <div id="activityFeed" class="feed"><div class="empty pad">No activity yet.</div></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============ POSITIONS ============ -->
-        <section class="view" id="view-positions">
-          <div class="panel">
-            <div class="panel-head">
-              <h2>Equity Positions <span class="tag">Alpaca</span></h2>
-              <button class="btn btn-ghost btn-sm" data-refresh="positions">Refresh</button>
-            </div>
-            <div class="panel-body no-pad">
-              <div id="equityPositions"><div class="empty pad">Connect Alpaca in Settings to see positions.</div></div>
-            </div>
-          </div>
-          <div class="panel">
-            <div class="panel-head">
-              <h2>Forex Positions <span class="tag">OANDA</span></h2>
-            </div>
-            <div class="panel-body no-pad">
-              <div id="forexPositions"><div class="empty pad">Connect OANDA in Settings to see positions.</div></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============ CONNECTIONS ============ -->
-        <section class="view" id="view-connections">
-          <div class="panel">
-            <div class="panel-head"><h2>Broker &amp; Exchange Connections</h2>
-              <span class="panel-sub">honest status for every integration</span>
-            </div>
-            <div class="panel-body">
-              <p class="note">Dawnstar connects to your own accounts with your own keys. We only ever add integrations that have a legitimate API — and we say so plainly when one doesn't.</p>
-              <div id="connectionsList"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============ FUNDING ============ -->
-        <section class="view" id="view-funding">
-          <div class="panel panel-dawn">
-            <div class="panel-head"><h2>Funding &amp; Allocation</h2>
-              <span class="badge badge-star">Non-custodial</span>
-            </div>
-            <div class="panel-body">
-              <div class="funding-disclaimer" id="fundDisclaimer"></div>
-              <div class="kpi-row" id="fundKpis"></div>
-              <div id="fundAccounts"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============ PERFORMANCE ============ -->
-        <section class="view" id="view-performance">
-          <div class="perf-toolbar">
-            <div class="seg" id="perfSource">
-              <button class="seg-btn active" data-source="alpaca">Equities · Alpaca</button>
-              <button class="seg-btn" data-source="oanda">Forex · OANDA</button>
-            </div>
-            <div class="seg" id="perfPeriod">
-              <button class="seg-btn" data-period="1W">1W</button>
-              <button class="seg-btn active" data-period="1M">1M</button>
-              <button class="seg-btn" data-period="3M">3M</button>
-              <button class="seg-btn" data-period="1A">1Y</button>
-              <button class="seg-btn" data-period="all">All</button>
-            </div>
-            <button class="btn btn-ghost btn-sm" data-refresh="performance">Refresh</button>
-            <button id="exportTradesBtn" class="btn btn-ghost btn-sm" title="Write a trade log to state\exports for records/tax">Export CSV</button>
-          </div>
-
-          <div class="kpi-row" id="perfStats"><!-- stat tiles injected --></div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <h2>Equity Curve</h2>
-              <span class="panel-sub" id="perfCurveSub">account value over time</span>
-            </div>
-            <div class="panel-body">
-              <div id="equityChart" class="chart"></div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <h2>Drawdown</h2>
-              <span class="panel-sub">percent below the running peak — the pain, not the gain</span>
-            </div>
-            <div class="panel-body">
-              <div id="drawdownChart" class="chart chart-sm"></div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head"><h2>Trade Log</h2>
-              <span class="panel-sub" id="tradeLogSub"></span>
-            </div>
-            <div class="panel-body no-pad">
-              <div id="tradeLog"><div class="empty pad">No trades yet.</div></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============ TRADERS ============ -->
-        <section class="view" id="view-traders">
-          <div class="panel">
-            <div class="panel-head">
-              <h2>Score from CSV</h2>
-              <div class="row-actions">
-                <input type="text" id="tradesPath" class="input input-wide" placeholder="Path to trades CSV (blank = state\trades.csv)" />
-                <button id="scoreBtn" class="btn btn-primary btn-sm">Score</button>
-              </div>
-            </div>
-          </div>
-          <div class="panel">
-            <div class="panel-head">
-              <h2>Pull from Myfxbook <span id="mfxConnFlag" class="setflag">not connected</span></h2>
-            </div>
-            <div class="panel-body">
-              <p class="note">Enter Myfxbook credentials in Settings first. Provide each trader's numeric account ID (from their profile URL <code>myfxbook.com/members/&lt;name&gt;/&lt;slug&gt;/&lt;ID&gt;</code>), comma-separated. The API returns only the last 50 trades per account — a quick look, not a full record.</p>
-              <div class="mfx-controls">
-                <input id="mfxIds" class="input input-wide" placeholder="Account IDs, e.g. 1234567,7654321" />
-                <input id="mfxStartBal" class="input" type="number" placeholder="assumed start balance (10000)" />
-                <button id="mfxPullBtn" class="btn btn-primary btn-sm">Pull &amp; Score</button>
-              </div>
-              <span id="mfxStatus" class="panel-sub"></span>
-            </div>
-          </div>
-          <div class="panel">
-            <div class="panel-head"><h2>Scorecard</h2></div>
-            <div class="panel-body no-pad">
-              <div id="scorecard"><div class="empty pad">Score a trades CSV or pull from Myfxbook to rank traders by risk-adjusted quality.</div></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============ PORTFOLIO ============ -->
-        <section class="view" id="view-portfolio">
-          <div class="panel">
-            <div class="panel-head"><h2>Diversified Portfolio</h2>
-              <span class="panel-sub">breadth &gt; signal — portfolio Sharpe = s·√k</span>
-            </div>
-            <div class="panel-body">
-              <p class="muted" style="margin-top:0">
-                No single strategy clears the bar. The honest edge is combining
-                genuinely <b>uncorrelated</b> positive-edge sleeves, risk-parity sized,
-                and judging the combined stream through the identical tiered gate.
-              </p>
-              <div class="form-row">
-                <label>Portfolio
-                  <select id="pfName" class="input">
-                    <option value="global_diversified">Global Diversified — cross-asset (recommended)</option>
-                    <option value="diversified_core">Diversified Core — equities + FX + crypto</option>
-                    <option value="live_core">Live Core — one sleeve per venue</option>
-                  </select>
-                </label>
-                <label>Trial count N
-                  <input id="pfTrials" class="input" type="number" value="120" min="1" step="1" />
-                </label>
-                <button class="btn btn-primary" id="pfRun">Build &amp; Score Portfolio</button>
-              </div>
-              <div id="pfNote" class="muted" style="font-size:12px"></div>
-              <div id="pfStatus" class="muted" style="margin-top:8px"></div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head"><h2>Live Execution</h2>
-              <span class="panel-sub">the tier is the risk dial — paper-first, gated</span></div>
-            <div class="panel-body">
-              <p class="muted" style="margin-top:0">
-                Computes per-venue target files (Alpaca equities · OANDA forex · Coinbase crypto)
-                <b>gated and sized by the validation tier</b> — REJECT ⇒ flat, PROMISING ⇒ 20% of
-                target risk, PROVEN ⇒ full. Then reconciles live positions to them. Coinbase has no
-                sandbox, so crypto is <b>paper-simulated</b> unless the dual live-gate is armed.
-              </p>
-              <div class="form-row">
-                <label>Portfolio capital ($)
-                  <input id="pfCapital" class="input" type="number" value="10000" min="100" step="100" />
-                </label>
-                <button class="btn" id="pfRefresh">Refresh Free Data</button>
-                <button class="btn" id="pfTargets">Generate Live Targets</button>
-                <button class="btn btn-primary" id="pfCycle">Run Dry-Run Cycle</button>
-              </div>
-              <div id="pfLiveStatus" class="muted" style="margin-top:8px"></div>
-              <div id="pfTargetsOut" style="display:none;margin-top:10px"></div>
-            </div>
-          </div>
-          <div class="panel" id="pfForwardPanel">
-            <div class="panel-head"><h2>Forward Track Record</h2>
-              <div class="row-actions">
-                <span class="panel-sub">live / paper vs the backtest — the only evidence that counts</span>
-                <button id="pfSnapBtn" class="btn btn-ghost btn-sm">Record Snapshot</button>
-              </div>
-            </div>
-            <div class="panel-body">
-              <p class="muted" style="margin-top:0">A PROVEN backtest is a hypothesis. This records your
-                paper/live portfolio value over time and compares the <b>realized forward Sharpe</b> to the
-                backtest — so you scale only on forward confirmation, never on a backtest alone. Every portfolio
-                cycle logs a snapshot automatically; you can also record one now.</p>
-              <div id="pfForward"><div class="empty">Loading…</div></div>
-            </div>
-          </div>
-
-          <div id="pfResult" style="display:none">
-            <div class="panel">
-              <div class="panel-head"><h2>Combined Result</h2>
-                <span class="panel-sub" id="pfHeadline">—</span>
-              </div>
-              <div class="panel-body">
-                <div id="pfRigor" class="rigor-inline"></div>
-                <canvas id="pfEquity" height="150" style="width:100%;margin-top:12px"></canvas>
-              </div>
-            </div>
-            <div class="panel">
-              <div class="panel-head"><h2>Sleeves</h2>
-                <span class="panel-sub">each an independent engine run</span></div>
-              <div class="panel-body"><div id="pfSleeves"></div></div>
-            </div>
-            <div class="panel">
-              <div class="panel-head"><h2>Correlation Matrix</h2>
-                <span class="panel-sub" id="pfAvgCorr">the diversification evidence</span></div>
-              <div class="panel-body"><div id="pfCorr" style="overflow-x:auto"></div></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============ BACKTEST ============ -->
-        <section class="view" id="view-backtest">
-          <div class="panel">
-            <div class="panel-head"><h2>Strategy Backtest</h2>
-              <span class="panel-sub" id="barsAvail">—</span>
-            </div>
-            <div class="panel-body">
-              <div class="form-grid">
-                <label>Strategy
-                  <select id="btStrategy" class="input">
-                    <option value="meanrev">Mean-Reversion (equities)</option>
-                    <option value="trend">Trend &mdash; time-series momentum</option>
-                    <option value="carry">Carry &mdash; FX cross-sectional (needs rates)</option>
-                    <option value="blend">Blend &mdash; Carry+Value+Momentum (FX)</option>
-                    <option value="momentum">Momentum &mdash; cross-sectional 12mo</option>
-                    <option value="value">Value &mdash; long-term reversion proxy</option>
-                    <option value="lowvol">Low-Vol &mdash; defensive / betting-against-beta</option>
-                  </select>
-                </label>
-                <label>Market data
-                  <select id="btMarket" class="input">
-                    <option value="bars_multi">Cross-asset ETFs (bars_multi)</option>
-                    <option value="bars_eq">Equities (bars_eq)</option>
-                    <option value="bars_fx">Forex (bars_fx)</option>
-                    <option value="bars_crypto">Crypto — Coinbase (bars_crypto)</option>
-                    <option value="bars_crypto_wide">Crypto — deep history (bars_crypto_wide)</option>
-                    <option value="bars">Legacy sample (bars)</option>
-                  </select>
-                </label>
-                <label>Trials N <input id="btTrials" class="input" type="number" value="1" title="strategies/variants searched program-wide -- charges the honest multiple-testing haircut" /></label>
-              </div>
-              <div class="form-grid">
-                <label>Symbols <input id="btSymbols" class="input" value="AAPL,MSFT,SPY" /></label>
-                <label>Slippage bps <input id="btSlip" class="input" type="number" value="5" /></label>
-              </div>
-              <!-- mean-reversion-only knobs: hidden for other strategies to cut clutter -->
-              <div class="form-grid" id="btMeanrevParams">
-                <label>SMA <input id="btSma" class="input" type="number" value="20" /></label>
-                <label>Buy % <input id="btBuy" class="input" type="number" step="0.01" value="0.05" /></label>
-                <label>Sell % <input id="btSell" class="input" type="number" step="0.01" value="0.05" /></label>
-                <label>Stop % <input id="btStop" class="input" type="number" step="0.01" value="0.03" /></label>
-              </div>
-              <div class="rigor-toggles">
-                <label class="check"><input id="btSweep" type="checkbox" /> Parameter sweep <span class="hint">(IS/OOS + Deflated Sharpe + PBO)</span></label>
-                <label class="check"><input id="btWf" type="checkbox" /> Walk-forward <span class="hint">(rolling re-optimization, 4 folds)</span></label>
-                <label class="check"><input id="btMc" type="checkbox" checked /> Monte Carlo <span class="hint">(1,000 resamples → confidence bands)</span></label>
-              </div>
-              <div class="rigor-toggles">
-                <label class="check"><input id="btTrend" type="checkbox" /> Trend gate <span class="hint">(adaptive: stand down mean-reversion in strong trends)</span></label>
-                <label class="check"><input id="btCpcv" type="checkbox" /> CPCV + Validation Gate <span class="hint">(combinatorial purged CV &rarr; PROVEN / PROMISING / REJECT tier)</span></label>
-                <label class="check"><input id="btShort" type="checkbox" /> Allow short <span class="hint">(trend: short downtrends)</span></label>
-                <label class="check">Vol target <input id="btVol" class="input" type="number" step="0.01" placeholder="0 = off" style="width:90px;margin-left:6px" /> <span class="hint">(adaptive: size to constant annual vol, e.g. 0.15)</span></label>
-              </div>
-              <div class="form-actions">
-                <button id="btRunBtn" class="btn btn-primary">Run Backtest</button>
-                <span id="btStatus" class="panel-sub"></span>
-              </div>
-            </div>
-          </div>
-          <div class="panel panel-rigor" id="rigorPanel" style="display:none">
-            <div class="panel-head"><h2>Anti-Overfitting Scorecard</h2>
-              <div class="row-actions">
-                <span class="panel-sub">the numbers other tools don't show you</span>
-                <button id="skepticBtn" class="btn btn-ghost btn-sm">◆ Consult the Skeptic</button>
-              </div>
-            </div>
-            <div class="panel-body" id="rigorBody"></div>
-          </div>
-
-          <div class="panel panel-danger" id="skepticPanel" style="display:none">
-            <div class="panel-head"><h2>AI Overfitting Skeptic</h2>
-              <span class="badge badge-danger">Paid Pessimist</span>
-            </div>
-            <div class="panel-body" id="skepticBody"></div>
-          </div>
-
-          <div class="panel" id="btResultsPanel" style="display:none">
-            <div class="panel-head"><h2>Results</h2>
-              <span class="panel-sub">Strategy vs. equal-weight buy &amp; hold (same window, same costs)</span>
-            </div>
-            <div class="panel-body no-pad">
-              <div id="btResults"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============ LOGS ============ -->
-        <section class="view" id="view-logs">
-          <div class="panel panel-fill">
-            <div class="panel-head">
-              <h2>Cycle Log <span class="tag" id="logFileName">—</span></h2>
-              <div class="row-actions">
-                <label class="check"><input id="logAuto" type="checkbox" checked /> Auto-refresh</label>
-                <button class="btn btn-ghost btn-sm" data-refresh="logs">Refresh</button>
-              </div>
-            </div>
-            <div class="panel-body no-pad">
-              <div id="logView" class="logview"><div class="empty pad">No log yet — run a cycle.</div></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============ SETTINGS ============ -->
-        <section class="view" id="view-settings">
-          <div class="grid-2">
-            <div class="panel">
-              <div class="panel-head"><h2>Broker Credentials</h2>
-                <span class="badge badge-paper">Paper / Practice</span>
-              </div>
-              <div class="panel-body">
-                <p class="note">With your vault unlocked, values are sealed inside it (Argon2id + AES-256-GCM), injected into the engine only at run time, and never displayed back. Fields show only whether a credential is currently set. (If you save while the vault is locked, they fall back to Windows user environment variables — less secure; unlock first.)</p>
-                <div class="cred-group">
-                  <div class="cred-title">Alpaca <span id="alpacaSet" class="setflag">not set</span></div>
-                  <label>Key ID <input id="cred_ALPACA_KEY_ID" class="input" type="password" placeholder="paper key id" autocomplete="off" /></label>
-                  <label>Secret <input id="cred_ALPACA_SECRET_KEY" class="input" type="password" placeholder="paper secret" autocomplete="off" /></label>
-                </div>
-                <div class="cred-group">
-                  <div class="cred-title">OANDA <span id="oandaSet" class="setflag">not set</span></div>
-                  <label>Token <input id="cred_OANDA_TOKEN" class="input" type="password" placeholder="practice token" autocomplete="off" /></label>
-                  <label>Account ID <input id="cred_OANDA_ACCOUNT_ID" class="input" placeholder="101-xxx-xxxxxxx-xxx" autocomplete="off" /></label>
-                </div>
-                <div class="cred-group">
-                  <div class="cred-title">Coinbase <span class="tag">crypto</span> <span id="coinbaseSet" class="setflag">not set</span></div>
-                  <label>CDP API Key <input id="cred_COINBASE_API_KEY" class="input" type="password" placeholder="organizations/.../apiKeys/..." autocomplete="off" /></label>
-                  <label>CDP API Secret <input id="cred_COINBASE_API_SECRET" class="input" type="password" placeholder="-----BEGIN EC PRIVATE KEY----- (ECDSA)" autocomplete="off" /></label>
-                  <p class="note" style="margin:2px 0 0">Official Coinbase Advanced Trade API. Create a CDP key (ECDSA, view + trade) at cdp.coinbase.com. Your own account only.</p>
-                </div>
-                <div class="cred-group">
-                  <div class="cred-title">AI Skeptic <span class="tag">optional</span> <span id="anthropicSet" class="setflag">not set</span></div>
-                  <label>Anthropic API Key <input id="cred_ANTHROPIC_API_KEY" class="input" type="password" placeholder="sk-ant-... (your own key)" autocomplete="off" /></label>
-                  <p class="note" style="margin:2px 0 0">Powers the adversarial AI critic. It only ever <strong>lowers</strong> confidence in a strategy — it can never green-light one, never places or vetoes a trade, and never touches the trading engine. Works offline (heuristic) without a key.</p>
-                </div>
-                <div class="cred-group">
-                  <div class="cred-title">Myfxbook <span class="tag">optional</span> <span id="myfxbookSet" class="setflag">not set</span></div>
-                  <label>Email <input id="cred_MYFXBOOK_EMAIL" class="input" placeholder="you@example.com" autocomplete="off" /></label>
-                  <label>Password <input id="cred_MYFXBOOK_PASSWORD" class="input" type="password" placeholder="Myfxbook password" autocomplete="off" /></label>
-                  <p class="note" style="margin:2px 0 0">Used only to pull trader history for scoring. The API returns just the <strong>last 50 trades</strong> per account and no data for watched accounts without an ID — for a full track record, export the CSV from the trader's Myfxbook page instead.</p>
-                </div>
-                <button id="saveCredsBtn" class="btn btn-primary">Save Credentials</button>
-                <span id="credStatus" class="panel-sub"></span>
-                <p class="note" id="credVaultNote" style="margin:14px 0 0"></p>
-              </div>
-            </div>
-
-            <div class="panel">
-              <div class="panel-head"><h2>Risk, Tuning &amp; Data</h2></div>
-              <div class="panel-body">
-                <div class="form-grid">
-                  <label>Max forex units <input id="opt_MAX_FOREX_UNITS" class="input" placeholder="1000" /></label>
-                  <label>Forex NAV risk % <input id="opt_FOREX_NAV_RISK_PCT" class="input" placeholder="off" /></label>
-                  <label>Forex daily-loss % <input id="opt_MAX_FOREX_DAILY_LOSS_PCT" class="input" placeholder="3" /></label>
-                  <label>Alpaca data feed <input id="opt_ALPACA_DATA_FEED" class="input" placeholder="iex" /></label>
-                </div>
-                <div class="cred-group" style="margin-top:4px">
-                  <div class="cred-title">Optional data sources <span class="tag">free, read-only</span></div>
-                  <p class="note" style="margin:0 0 12px">Market-data keys only — they widen breadth and data quality (deeper crypto history, cleaner adjusted closes) and never touch trading. Sealed in the vault; values are never displayed back.</p>
-                  <label>CryptoCompare <span id="CRYPTOCOMPARE_API_KEY_set" class="setflag">not set</span>
-                    <input id="opt_CRYPTOCOMPARE_API_KEY" class="input" type="password" placeholder="deep crypto history (2010+)" autocomplete="off" /></label>
-                  <label>Tiingo <span id="TIINGO_API_KEY_set" class="setflag">not set</span>
-                    <input id="opt_TIINGO_API_KEY" class="input" type="password" placeholder="cleaner adjusted-close equities" autocomplete="off" /></label>
-                  <label>CoinGecko <span id="COINGECKO_API_KEY_set" class="setflag">not set</span>
-                    <input id="opt_COINGECKO_API_KEY" class="input" type="password" placeholder="crypto aggregator (optional)" autocomplete="off" /></label>
-                  <label>FRED <span id="FRED_API_KEY_set" class="setflag">not set</span>
-                    <input id="opt_FRED_API_KEY" class="input" type="password" placeholder="macro / rates (optional)" autocomplete="off" /></label>
-                </div>
-                <button id="saveOptsBtn" class="btn btn-primary">Save</button>
-                <span id="optStatus" class="panel-sub"></span>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid-2">
-            <div class="panel">
-              <div class="panel-head"><h2>Security</h2>
-                <span class="badge badge-star">AES-256 Vault</span>
-              </div>
-              <div class="panel-body">
-                <p class="note">Your broker keys are sealed in an encrypted vault — Argon2id key stretching + AES-256-GCM, DPAPI-bound to this Windows account. The same class of memory-hard, encrypt-a-local-vault design password managers like Bitwarden use. Secrets stay in memory only while unlocked and are wiped on lock or 15-minute idle.</p>
-                <label>Current master password <input id="secOldPw" class="input" type="password" autocomplete="off" /></label>
-                <label>New master password <input id="secNewPw" class="input" type="password" autocomplete="off" /></label>
-                <button id="changePwBtn" class="btn btn-primary btn-sm">Change Master Password</button>
-                <span id="secStatus" class="panel-sub"></span>
-                <p class="note warn-note" style="margin-top:14px">There is <strong>no password recovery</strong> and <code>state\vault.dat</code> is a single point of failure. Back it up and record your master password offline before you store live keys.</p>
-                <button id="backupVaultBtn" class="btn btn-ghost btn-sm">Back up vault</button>
-                <span id="backupStatus" class="panel-sub"></span>
-              </div>
-            </div>
-            <div class="panel">
-              <div class="panel-head"><h2>Notifications</h2></div>
-              <div class="panel-body">
-                <p class="note">Get alerted on order fills, risk halts, and rejected orders — across Windows toasts, your alert webhook, and (optional) email.</p>
-                <label class="check"><input id="notifToasts" type="checkbox" checked /> Windows desktop notifications</label>
-                <label>Alert webhook (Discord / Slack / ntfy) <input id="opt_ALERT_WEBHOOK_URL2" class="input" placeholder="https://..." /></label>
-                <div style="display:flex; gap:10px; margin-top:6px">
-                  <button id="saveNotifBtn" class="btn btn-primary btn-sm">Save</button>
-                  <button id="testNotifBtn" class="btn btn-ghost btn-sm">Send Test</button>
-                </div>
-                <span id="notifStatus" class="panel-sub"></span>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid-2">
-            <div class="panel">
-              <div class="panel-head"><h2>Forex Mirror Targets</h2>
-                <span class="panel-sub">state\forex_targets.csv</span>
-              </div>
-              <div class="panel-body">
-                <div id="targetsList"></div>
-                <div class="target-add">
-                  <input id="newInst" class="input" placeholder="EUR_USD" />
-                  <input id="newUnits" class="input" type="number" placeholder="units (+long/-short)" />
-                  <button id="addTargetBtn" class="btn btn-ghost btn-sm">Add</button>
-                </div>
-                <button id="saveTargetsBtn" class="btn btn-primary">Save Targets</button>
-                <span id="targetStatus" class="panel-sub"></span>
-              </div>
-            </div>
-
-            <div class="panel">
-              <div class="panel-head"><h2>Automation Schedule</h2></div>
-              <div class="panel-body">
-                <div id="scheduleInfo" class="sched-info"><div class="empty">Loading…</div></div>
-                <div class="sched-actions">
-                  <button id="schInstall" class="btn btn-primary btn-sm">Install Task</button>
-                  <button id="schEnable" class="btn btn-ghost btn-sm">Enable</button>
-                  <button id="schDisable" class="btn btn-ghost btn-sm">Disable</button>
-                  <button id="schRemove" class="btn btn-danger-ghost btn-sm">Remove</button>
-                </div>
-                <p class="note">Runs a cycle every 30 min, 08:30–15:30 US Central (= 9:30 ET open to 15:00 CT close), weekdays. The engine skips closed-market cycles automatically.</p>
-                <p class="note warn-note">Security tradeoff, stated plainly: a scheduled cycle runs while you are away, so it <strong>cannot unlock your encrypted vault</strong>. For unattended trading, the broker keys it uses must live in Windows environment variables (less protected than the vault). If you want keys only ever in the vault, run cycles manually from this app instead of installing the task.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel panel-danger">
-            <div class="panel-head"><h2>Live Trading Gates</h2>
-              <span class="badge badge-danger">Real Money</span>
-            </div>
-            <div class="panel-body">
-              <p class="note">Two independent gates are required for real money, on top of live broker keys. Both are OFF by default. Leave them off for paper testing — the point of the paper phase is weeks of measured results before any of this.</p>
-              <div class="gate-row">
-                <div class="gate-item">
-                  <div class="gate-name">Gate 1 — LIVE_TRADING env <span id="liveEnvFlag" class="setflag">false</span></div>
-                  <label class="switch"><input id="liveEnvToggle" type="checkbox" /><span class="slider"></span></label>
-                </div>
-                <div class="gate-item">
-                  <div class="gate-name">Gate 2 — Risk acknowledgement file <span id="liveGateFlag" class="setflag">absent</span></div>
-                  <label class="switch"><input id="liveGateToggle" type="checkbox" /><span class="slider"></span></label>
-                </div>
-              </div>
-              <div class="live-status" id="liveStatus">Currently: <strong>PAPER / PRACTICE</strong></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============ USER GUIDE ============ -->
-        <section class="view" id="view-guide">
-          <div class="guide"><!--GUIDE_CONTENT_START--><div class="guide-hero"><div class="g-eyebrow">Dawnstar Trading · the complete guide</div><h1 class="g-title">Dawnstar Trading — The Complete User Guide</h1><p class="guide-tagline">Dawnstar is an automated, validation-first systematic trading app for stocks, forex, and crypto that one person runs on their own PC with their own broker keys — its real product is a rigor engine built to stop you fooling yourself, not a promise of profit.</p><div class="guide-whatis"><p>Dawnstar Trading is a self-contained native Windows desktop app (current version 2.1.0) that runs an automated, multi-asset systematic trading pipeline over brokers you connect yourself. There is no cloud account, no web login, and no subscription. At its heart is a single C++ program (the "engine") that decides what to trade, wrapped in a "flight-deck for money" desktop UI you launch by double-clicking Dawnstar.exe. It trades three asset classes through the brokers' official APIs using your own keys: US stocks and ETFs via Alpaca, foreign exchange via OANDA, and crypto via Coinbase Advanced Trade. Your money and your account stay entirely at those regulated brokers — Dawnstar is "bring your own broker" software that never touches custody.</p><p>What makes Dawnstar different is that its philosophy is inverted from the rest of the industry. Most trading software sells a beautiful backtest curve going up-and-to-the-right; the dirty secret is that those curves are mostly overfit — someone tried hundreds of parameter combinations and kept the prettiest one, and it collapses when real money touches it. Dawnstar takes the opposite stance: it bakes professional-grade anti-overfitting statistics (Deflated Sharpe Ratio, Probability of Backtest Overfitting, walk-forward, Monte Carlo, combinatorial cross-validation) into the core workflow and shows them to you plainly — even when the honest answer is "this isn't real." Every backtest and every scored strategy carries a plain-English significance verdict. The honesty is deliberately the product, not the marketing.</p><p>Who it is for: a single technically-comfortable person who wants to run a disciplined, diversified, systematic book with their own capital and their own broker accounts, and who values knowing the truth about a strategy over being sold a dream. It is not for people who want a hands-off money machine, day-trading signals, or someone to manage their money — none of which Dawnstar is or pretends to be.</p><p>The validation-first philosophy shows up everywhere. The app defaults to paper/practice trading, all account data is read-only, and moving real money requires deliberately clearing two independent gates on top of supplying live keys. The strategy thesis is that edge comes from breadth — combining many genuinely uncorrelated, individually-modest bets — not from a clever signal. And the app's bedrock, repeated everywhere, is that it has "no demonstrated edge": even its statistically strongest backtest is still just a backtest with no live track record, so the correct way to use it is to deploy small, paper-track for months, and scale only if forward results confirm.</p></div></div><div class="guide-honesty"><div class="g-honesty-h"><span>&#10022;</span> Read this first — the honest bottom line</div><p>Dawnstar has NO demonstrated trading edge, and it says so louder than it says anything else. Its recommended portfolio ("Global Diversified") earns a statistically PROVEN verdict — Sharpe 0.75, t-stat 3.31, on 19.6 years of business-day data — but that is a historical backtest whose components were chosen with hindsight, with zero live track record. A green "PROVEN" scorecard means "less likely to be pure overfit," NOT "this will make money." Therefore the correct operating stance for EVERYTHING, even a PROVEN book, is Tier B: deploy small, paper-track for 6–18 months, and scale only if live performance confirms the backtest forward. Nothing runs at full live size on a backtest alone.</p><p>What Dawnstar deliberately is NOT: it is not a custodial wallet, not a bank, not a money transmitter, and it never holds, moves, or has withdrawal access to your funds — your money stays at the regulated brokers you connect with your own revocable API keys. It does not connect to Robinhood (no official API). It is not an investment adviser, broker-dealer, or fiduciary, and nothing it displays is a recommendation to buy, sell, or hold. It does not day-trade or chase intraday alpha, does not use black-box AI anywhere near a trade decision, and does not check for or install its own updates. Trading risks real money — potentially all of your deployed capital, and in leveraged forex sometimes more than you deposited — so trade only money you can afford to lose entirely. Note: an earlier headline of Sharpe 0.80 / t-stat 4.05 (and a "Core" of 0.60 / t 3.03 labeled PROVEN) was an annualization artifact caused by counting crypto's weekend rows as extra trading days; it is superseded and must never be cited as current. The honest, current figures are Global Diversified 0.75 / t 3.31 (PROVEN), Diversified Core 0.52 / t 2.36 (PROMISING), and Live Core 0.48 / t 2.07 (PROMISING).</p></div><div class="guide-body"><nav class="guide-toc"><div class="g-toc-h">On this page</div><button data-target="what-and-who"><span class="g-toc-n">01</span>What Dawnstar Is &amp; Who It's For</button><button data-target="getting-started"><span class="g-toc-n">02</span>Getting Started &amp; First Launch</button><button data-target="connections"><span class="g-toc-n">03</span>Connecting Brokers &amp; Data Sources</button><button data-target="portfolios"><span class="g-toc-n">04</span>The Portfolio Options: Sleeves, Tiers &amp; the Honest Numbers</button><button data-target="backtest-lab"><span class="g-toc-n">05</span>The Backtest Lab &amp; Strategies</button><button data-target="rigor-engine"><span class="g-toc-n">06</span>The Validation / Rigor Engine, in Plain English</button><button data-target="execution"><span class="g-toc-n">07</span>Paper &amp; Live Execution</button><button data-target="daily-use"><span class="g-toc-n">08</span>Every Other Feature &amp; the Day-to-Day Workflow</button><button data-target="honesty-limits"><span class="g-toc-n">09</span>Honesty, Limits, Safety &amp; Legal Reality</button><button data-target="glossary"><span class="g-toc-n">＊</span>Glossary</button></nav><div class="guide-article"><article class="g-chapter" id="what-and-who"><div class="g-ch-head"><span class="g-ch-num">1</span><h2 class="g-ch-title">What Dawnstar Is &amp; Who It's For</h2></div><p class="g-intro">Dawnstar Trading is a single-user, own-capital, validation-first automated trading app. Before any feature makes sense, it helps to understand the one idea the whole product is built around: a system designed to stop you fooling yourself.</p><div class="g-sec"><h3 class="g-sec-h">The one-paragraph version</h3><p class="g-p">Dawnstar is a native Windows desktop app (version 2.1.0) that runs an automated, multi-asset systematic trading pipeline. You launch it by double-clicking Dawnstar.exe; behind the window a single C++ engine decides what to trade and sends orders through the official APIs of brokers you connect with your own keys — Alpaca for US equities, OANDA for forex, and Coinbase Advanced Trade for crypto. It can run hands-off on a schedule or you can run cycles manually. Your money and account stay entirely at those regulated brokers; Dawnstar is just software that drives them. It is MIT-licensed, needs no internet to launch, and defaults to paper/practice trading so that first-time use carries essentially no risk.</p><dl class="g-details"><dt>Form factor</dt><dd>Native Windows desktop app (Dawnstar.exe) plus a C++ engine binary next to it — no cloud, no web login, no Linux/WSL</dd><dt>Version</dt><dd>2.1.0 (shown in the sidebar and at /api/status)</dd><dt>Asset classes / brokers</dt><dd>Equities (Alpaca), Forex (OANDA), Crypto (Coinbase Advanced Trade) — your own API keys</dd><dt>Default mode</dt><dd>Paper / practice; real money needs two deliberate manual gates</dd><dt>License / UI theme</dt><dd>MIT; a 'flight-deck for money' — starfield, 8-point Dawnstar star, warm dawn accent</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">The core philosophy: built to stop you fooling yourself</h3><p class="g-p">This is the whole point of Dawnstar. The trading-software industry sells the dream of a backtest equity curve that only goes up. Most of those curves are overfit — the result of trying hundreds of combinations and keeping the prettiest — and they fall apart on real money. Dawnstar refuses to play that game. Instead of out-featuring the big platforms, it bakes professional anti-overfitting statistics into the core workflow and shows them plainly, even when the answer is 'no demonstrated edge.' Every backtest and every scored strategy carries a plain-English significance verdict. The tools that do this are collectively the 'Rigor Engine,' and the same C++ engine that computes them is the one that trades live, on a deterministic seed, so the scorecard matches what actually runs. As the docs put it: none of this makes a losing strategy win — that is the point. The honest verdict is the product.</p><div class="g-caveat">A green 'PROVEN' scorecard means 'less likely to be pure overfit,' never 'this will make money.'</div><div class="g-caveat">The app is deliberately conservative: it would rather report INSUFFICIENT or 'no edge found' than manufacture a pass.</div></div><div class="g-sec"><h3 class="g-sec-h">The strategy thesis: breadth beats a clever signal</h3><p class="g-p">Dawnstar's research conclusion is that there is no magic indicator. Every real trading signal is weak — a single-market trend strategy is roughly 0.4 Sharpe, and even Warren Buffett's realized Sharpe over 40 years was about 0.79. The edge comes from BREADTH: combining many genuinely uncorrelated positive-edge bets, because portfolio Sharpe grows as (per-bet Sharpe) times the square root of the number of independent bets. So Dawnstar builds a diversified basket of literature-backed 'sleeves' rather than one strategy, and it matches the mechanism to the market. Trend-following (time-series momentum) is the unifying core because it has multi-decade, cross-asset, out-of-sample evidence across equities, FX, and crypto. Mean-reversion is kept only as an equities sleeve, gated by trend strength, and is never run on crypto or FX. Crypto trends but is punished by fees, so it gets trend/low-vol only. FX gets trend plus a small, capped, tail-aware carry sleeve. Two further principles: never chase intraday/day-trading alpha (studies find roughly 97% of persistent day traders lose), and use Kelly sizing only as a CAP (at most quarter-Kelly), never a target.</p><dl class="g-details"><dt>Core mechanism</dt><dd>Time-series momentum / trend-following on each instrument's own price</dd><dt>Diversification identity</dt><dd>portfolio Sharpe = s·√k for k uncorrelated sleeves; Dawnstar's sleeves average ~0.085 pairwise correlation</dd><dt>Day trading</dt><dd>Deliberately not built — ~97% of persistent day traders lose; turnover cost is the enemy</dd><dt>Kelly</dt><dd>A cap only (≤ ¼ Kelly), never a target — full Kelly needs a known edge Dawnstar does not claim</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">What Dawnstar deliberately is NOT</h3><p class="g-p">Several 'we don't do this' commitments define the brand as much as any feature. It is non-custodial: not a wallet, bank, money transmitter, or custodian, and it never holds, receives, moves, or has withdrawal access to your funds. Your money stays at your brokers; Dawnstar only sends orders through their official APIs with keys you control and can revoke. It does NOT connect to Robinhood — the Connections view lists Robinhood as 'unsupported' because there is no official API and unofficial ones violate Robinhood's terms and risk your account. It is not financial advice, not an investment adviser or broker-dealer, and not a fiduciary. And it refuses the industry's scam tells: no guaranteed or target returns, no cherry-picked date pickers, no leaderboards or testimonials, and it will show a NULL / insufficient-evidence verdict rather than manufacture a pass.</p><dl class="g-details"><dt>Non-custodial</dt><dd>Never holds or moves your money; funds stay at your brokers; keys are yours and revocable</dd><dt>No Robinhood</dt><dd>Listed 'unsupported' — no official API; unofficial access violates ToS and risks your account</dd><dt>Not advice</dt><dd>Not an adviser, broker-dealer, or fiduciary; nothing shown is a recommendation</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">AI done honestly: a Skeptic that can only argue for caution</h3><p class="g-p">Dawnstar has AI, but it is the opposite of 'AI trading bot' hype. Its guiding line: the alpha in AI trading is not fooling yourself, so the AI's job is to catch your self-deception, not to promise you the market. The flagship feature is the AI Overfitting Skeptic, built around one hard invariant: the AI can only ever argue for MORE caution about a strategy — only the deterministic C++ engine can green-light one. The Skeptic reviews a backtest's rigor numbers and argues adversarially why the strategy is probably overfit. It works fully offline as pure arithmetic; with your own Anthropic API key it adds a written critique. The isolation is structural, not a promise: the AI lives in the Python/GUI layer, the C++ engine has zero dependency on it and cannot call it, and a test asserts the engine's output is byte-identical whether or not an API key is present. The AI never places, sizes, times, or vetoes a trade. Deep learning for price prediction, reinforcement learning, and any LLM near the trade decision are deliberately not shipped.</p><div class="g-caveat">The 'only argue for caution' guarantee is HARD for the offline heuristic (pure arithmetic) but only PROMPT-enforced for the optional LLM; the load-bearing hard guarantee is the AI's total isolation from the trade path.</div></div></article><article class="g-chapter" id="getting-started"><div class="g-ch-head"><span class="g-ch-num">2</span><h2 class="g-ch-title">Getting Started &amp; First Launch</h2></div><p class="g-intro">Dawnstar runs two ways — a recommended desktop-app route and a developer/automation route — and both start safely in paper mode. Setup is deliberately low-risk: no real money can move until you deliberately arm two gates later.</p><div class="g-sec"><h3 class="g-sec-h">Two ways to run it, both paper by default</h3><p class="g-p">There are two supported paths. (1) The desktop app — you run Dawnstar.exe. This is recommended for anyone who just wants to use the app; it bundles its own Python runtime, a local Flask/waitress server, and a pywebview/WebView2 window, so no Python install is needed, and it locates the engine and your data folders automatically. (2) The from-source / engine route — for developers or people who want unattended (Windows Task Scheduler) trading; it needs a C++ toolchain (MinGW-w64 via MSYS2) to build the engine and is driven from PowerShell scripts. Whichever route you take, the app boots in paper/practice mode — no real money can move until you deliberately arm two separate live gates.</p><dl class="g-details"><dt>Recommended route</dt><dd>Run Dawnstar.exe — no Python required</dd><dt>Developer/automation route</dt><dd>Build engine from source (install.ps1, preflight.ps1) + Windows Task Scheduler</dd><dt>Default safety state</dt><dd>Paper / practice; both live gates OFF by default</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">What you need and what's in the box</h3><p class="g-p">Dawnstar is Windows-only by design (its vault's second encryption layer uses Windows DPAPI, and the toolchain is native Windows with no WSL). The window is drawn by Microsoft Edge WebView2; if a native window can't be created for any reason, the app quietly falls back to opening in Edge or Chrome in app-mode. The prebuilt package already contains the compiled engine — pipeline.exe (the live orchestrator) and backtest.exe (the historical simulator) — plus the runtime DLLs they need (OpenSSL 3.6.3, libcurl 8.21.0, zlib, and others), each inventoried with SHA-256 hashes. You only build these yourself on the from-source route (g++ 16.1.0 via MSYS2 in this build). Running purely from source additionally needs Python with a pinned dependency set (flask 3.1.3, waitress 3.0.2, pywebview 6.2.1, cryptography 49.0.0, argon2-cffi 25.1.0, and others).</p><dl class="g-details"><dt>Operating system</dt><dd>Windows (Windows 11 tested); DPAPI + Task Scheduler are Windows-native</dd><dt>Window renderer</dt><dd>Edge WebView2 (falls back to Edge/Chrome app-mode if the native window can't be created)</dd><dt>Prebuilt engine</dt><dd>engine\pipeline.exe + engine\backtest.exe with bundled DLLs</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Installing and launching the desktop app</h3><p class="g-p">For most users the install is: get the app onto your machine and run the exe. The public website download is packaged as a single Dawnstar-Setup.exe (with a companion .sha256 checksum). The app itself runs as a portable Dawnstar.exe that must sit inside the install tree (next to the engine\ folder) so it can find the engine, your state\ folder, and logs\; to run it elsewhere, set a DAWNSTAR_ROOT environment variable pointing at the install root. On first run Windows SmartScreen will flag the exe as an unknown publisher because the public build is currently unsigned — this is expected, not a warning about Dawnstar specifically. The app opens one native 1360x900 window (minimum 1040x680) after starting a private local server on a random 127.0.0.1 port. It enforces a single instance: launching again while it is running just shows a 'Dawnstar is already running.' message.</p><ol class="g-steps"><li>Place the Dawnstar folder wherever you like (the conventional fallback location is C:\DawnstarTrading).</li><li>Run Dawnstar.exe (or the Desktop shortcut).</li><li>If Windows shows 'unknown publisher,' clear it once: right-click Dawnstar.exe → Properties → tick 'Unblock' → OK, then relaunch.</li><li>Optionally verify integrity: run (Get-FileHash .\Dawnstar.exe -Algorithm SHA256).Hash and compare it to the value in Dawnstar.exe.sha256.</li><li>Wait for the native window to paint, then proceed to the first-run vault screen.</li></ol><div class="g-caveat">The public Dawnstar.exe is not yet Authenticode-signed, so SmartScreen will warn until it is signed; docs\SIGNING.md covers signing options.</div><div class="g-caveat">On some GPU/driver combinations the app defaults to software rendering (--disable-gpu) to avoid a blank window; override via WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS if needed.</div></div><div class="g-sec"><h3 class="g-sec-h">First launch: creating your encrypted vault</h3><p class="g-p">The very first time you open Dawnstar it shows a 'Secure your vault' screen before you can reach the app. Here you set a master password that encrypts all your broker API keys locally. The password is stretched with Argon2id (a memory-hard key-derivation function: t=3, 128 MiB, p=1 — the same class of design password managers like Bitwarden use for a local vault), and the resulting key seals a single file, state\vault.dat, with AES-256-GCM authenticated encryption; on Windows the sealed file is additionally wrapped with DPAPI so a copy is useless on another machine or account. The master password is never stored and there is no recovery — forget it and the stored keys are gone. You must also tick a checkbox accepting the Risk Disclaimer &amp; Terms, which explicitly acknowledges that trading risks real money, that no edge is demonstrated, and that past or backtested results never guarantee future results; the 'Create Vault &amp; Enter' button stays disabled until you tick it, and your acceptance is timestamped to state\consent.json. Creating the vault also migrates any broker keys you had stored as Windows environment variables and deletes the plaintext originals from the registry.</p><ol class="g-steps"><li>Type a master password (minimum 8 characters; an on-screen strength meter reads too short / weak / fair / strong / excellent).</li><li>Re-type it to confirm (the two must match).</li><li>Read the 'There is no recovery' warning — record this password somewhere safe offline.</li><li>Tick the consent checkbox accepting the Risk Disclaimer &amp; Terms.</li><li>Click 'Create Vault &amp; Enter →' — the app derives the key (~0.5s), seals the vault, records consent, and drops you into the dashboard.</li></ol><div class="g-caveat">There is genuinely no password reset or recovery — a forgotten master password means the stored keys are unrecoverable by design. Back up state\vault.dat and record the password offline before you ever store live keys.</div><div class="g-caveat">The vault protects against a stolen laptop or a copied file, but nothing running locally can fully defend against malware already running as your Windows user — true of any desktop password manager.</div></div><div class="g-sec"><h3 class="g-sec-h">Every launch after: unlocking, auto-lock, and changing the password</h3><p class="g-p">Once the vault exists, every launch shows a 'Welcome back' unlock screen. You type your master password and click 'Unlock' (Enter works too); a wrong password is simply rejected and the app stays sealed. While unlocked, secrets live in memory only, and the vault auto-locks after 15 minutes of inactivity, wiping them; you can also lock instantly with the sidebar '🔒 Lock Vault' button. You can change the master password any time in Settings → Security by entering the current and a new password — this re-derives the key and re-seals the vault without re-entering any broker keys. Because vault.dat is a single point of failure, Settings → Security also has a 'Back up vault' button that writes a timestamped, still-encrypted copy to state\backups.</p><dl class="g-details"><dt>Unlock</dt><dd>'Welcome back' → master password → 'Unlock →'</dd><dt>Auto-lock</dt><dd>After 15 minutes idle, secrets wiped from memory</dd><dt>Change password</dt><dd>Settings → Security → current + new master password (re-seals in place)</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">First-launch troubleshooting</h3><p class="g-p">A few first-run situations are normal, not failures. If nothing appears to open, the app may already be running — a second launch is intentionally suppressed with an 'already running' message because the app binds a fixed loopback lock port (8747) for its lifetime. If the native window is blank or partly painted, that is a known WebView2/GPU quirk the app mitigates with software rendering; you can override via WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS. If a native window can't be created at all, the app opens itself in Edge or Chrome in app-mode instead. If the local server doesn't come up within 15 seconds, the app exits with 'Server failed to start.' When reporting a bug, quote the build number shown in the sidebar as 'Dawnstar v2.1.0' (also in /api/status).</p><dl class="g-details"><dt>'Dawnstar is already running.'</dt><dd>Single-instance lock on loopback port 8747 — close the existing window first</dd><dt>Blank / partial window</dt><dd>WebView2 GPU quirk; app defaults to --disable-gpu</dd><dt>No native window</dt><dd>Falls back to Edge/Chrome app-mode automatically</dd></dl></div></article><article class="g-chapter" id="connections"><div class="g-ch-head"><span class="g-ch-num">3</span><h2 class="g-ch-title">Connecting Brokers &amp; Data Sources</h2></div><p class="g-intro">Dawnstar drives accounts you already own. You generate API keys inside each broker's own site, paste them into the app's encrypted vault, and Dawnstar sends orders through the official APIs. Separately, its backtesting and signals run entirely on FREE public market data.</p><div class="g-sec"><h3 class="g-sec-h">The big picture: you bring the accounts, Dawnstar drives them</h3><p class="g-p">Dawnstar does not open accounts, hold funds, move money, or act as a custodian. You already have (or open) accounts directly with the brokers, generate an API key inside each broker's own site, and paste those keys into Dawnstar. From then on it can read your balances/positions and — only if you deliberately go live — place orders through those keys. Three brokers are wired into the engine today: Alpaca (US equities), OANDA (forex), and Coinbase (crypto). Myfxbook is a fourth, read-only connection used only to pull a trader's history for scoring, not to trade. A broker API key can move money in your account, which is exactly why the app seals them in an encrypted vault and defaults every call to paper.</p><dl class="g-details"><dt>Trading brokers</dt><dd>Alpaca (equities), OANDA (forex), Coinbase (crypto)</dd><dt>Read-only extra</dt><dd>Myfxbook (pull trader history for scoring only)</dd><dt>Default mode</dt><dd>Paper / practice on every venue until you arm live</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">The Connections view: honest status for every integration</h3><p class="g-p">The Connections screen lists every broker and aggregator with a candid status label. 'Available' means a legitimate API you can use today with your own key: Alpaca, OANDA, and Coinbase (they flip to 'CONNECTED' once keys are set). 'Roadmap' means legitimate but not yet active because it needs a commercial/developer agreement: SnapTrade (multi-broker aggregation), Plaid Investments (read-only holdings), and Webull (access-gated OpenAPI). 'Unsupported' means the app refuses it on purpose: Robinhood, because it has no official trading API and unofficial libraries violate its terms and can get your account closed with positions liquidated — so Dawnstar will not put your account at risk. Only the three 'available' brokers actually trade today.</p><dl class="g-details"><dt>Available (usable now)</dt><dd>Alpaca, OANDA, Coinbase</dd><dt>Roadmap (not yet active)</dt><dd>SnapTrade, Plaid Investments, Webull</dd><dt>Unsupported (refused)</dt><dd>Robinhood — no official API; unofficial access risks your account</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Connect Alpaca (US equities)</h3><p class="g-p">Alpaca uses a Key ID + Secret pair. In paper mode Dawnstar talks to paper-api.alpaca.markets; only after both live gates are armed does it switch to api.alpaca.markets, so paper keys belong in the fields during testing. Note Alpaca trades US equities but NOT forex — forex symbols like EURUSD are simply skipped, which is why FX goes through OANDA. Once both fields are set, Dawnstar reads your equity, cash, buying power, day P/L, positions, and market clock read-only. Optionally set the Alpaca data feed to 'sip' in Settings if you pay for premium data — the default is the free 'iex' feed.</p><ol class="g-steps"><li>Create/copy an Alpaca API Key ID + Secret (use the Paper key while testing).</li><li>In Dawnstar: Settings → Broker Credentials → Alpaca.</li><li>Paste the Key ID and Secret into the two fields.</li><li>Click 'Save Credentials' (they seal into the unlocked vault).</li><li>Confirm the Alpaca status flag shows 'set' and the Dashboard chip turns on.</li></ol><dl class="g-details"><dt>Fields</dt><dd>Key ID (ALPACA_KEY_ID), Secret (ALPACA_SECRET_KEY)</dd><dt>Hosts</dt><dd>paper-api.alpaca.markets (default) / api.alpaca.markets (only when both live gates armed)</dd><dt>Data feed</dt><dd>Free 'iex' default; set ALPACA_DATA_FEED=sip if you pay for premium data</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Connect OANDA (forex)</h3><p class="g-p">OANDA uses a personal access Token plus a numeric Account ID (format like 101-xxx-xxxxxxx-xxx). Paper testing uses the practice host api-fxpractice.oanda.com; live uses api-fxtrade.oanda.com only after both gates are armed — so use a practice token while testing. Once both are set, Dawnstar reads your NAV, balance, unrealized P/L, currency, open-trade count, and open positions read-only, and can reconstruct a balance curve for the Performance view. OANDA is trade-only in Dawnstar — funding is done in OANDA's own portal.</p><ol class="g-steps"><li>Generate an OANDA v20 REST personal access token and identify your account ID.</li><li>In Dawnstar: Settings → Broker Credentials → OANDA.</li><li>Paste the token into 'Token' and the account number into 'Account ID'.</li><li>Click 'Save Credentials'.</li><li>Confirm the OANDA flag shows 'set' and the Dashboard OANDA chip turns on.</li></ol><dl class="g-details"><dt>Fields</dt><dd>Token (OANDA_TOKEN), Account ID (OANDA_ACCOUNT_ID, e.g. 101-xxx-xxxxxxx-xxx)</dd><dt>Hosts</dt><dd>api-fxpractice.oanda.com (default) / api-fxtrade.oanda.com (only when both live gates armed)</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Connect Coinbase (crypto) — the live-only exchange</h3><p class="g-p">Coinbase demands extra care: its Advanced Trade API has NO sandbox — there is only live api.coinbase.com. Dawnstar handles this by paper-SIMULATING crypto (logging the plan and submitting nothing) whenever the dual live-gate is not armed, so you can test safely, but there is no 'paper Coinbase' account behind it. Authentication is a modern CDP API key: a key name of the form organizations/{org}/apiKeys/{key} plus an ECDSA (EC) private key in PEM form. Dawnstar signs every request with a fresh, short-lived (2-minute) ES256 JWT — there are no HMAC secrets. Create the key at cdp.coinbase.com with least privilege (view + trade, NOT transfer/withdraw). When live crypto is eventually authorized, every order is additionally bounded by a fat-finger cap COINBASE_MAX_ORDER_USD (default $500) plus a price-sanity cross-check against recent daily closes; a stale or garbage price fails closed and skips the order. Remember crypto fees are real: Coinbase retail runs roughly 0.6% maker / 1.2% taker, which the engine models and gates against a minimum-edge threshold.</p><ol class="g-steps"><li>At cdp.coinbase.com create a CDP API key: type ECDSA, scope view + trade only (not transfer).</li><li>Copy the key name and the EC private key PEM.</li><li>In Dawnstar: Settings → Broker Credentials → Coinbase.</li><li>Paste the key name into 'CDP API Key' and the PEM (with real newlines, not literal backslash-n) into 'CDP API Secret'.</li><li>Click 'Save Credentials'; crypto stays paper-simulated until the dual live-gate is armed.</li></ol><div class="g-caveat">Coinbase has no practice/sandbox — 'paper' crypto is a local simulation only (logs the plan, submits nothing).</div><div class="g-caveat">Crypto fees are real and punishing (~0.6% maker / 1.2% taker); budget for them even when the engine gates on minimum edge.</div><div class="g-caveat">A common mistake is pasting the PEM with literal backslash-n instead of real newlines — the signer rejects it.</div></div><div class="g-sec"><h3 class="g-sec-h">Where keys live: the encrypted vault</h3><p class="g-p">Every secret you enter is sealed in a single local file, state\vault.dat, using the same class of design as local-vault password managers like Bitwarden: your master password is stretched by Argon2id (128 MiB) into an encryption key, which encrypts the file with AES-256-GCM authenticated encryption, additionally wrapped with Windows DPAPI. The master password is never stored, so there is no recovery. While unlocked, secrets are decrypted into memory only and are wiped on lock or after 15 minutes idle. The app never displays a stored value back — Settings fields only show whether each credential is currently 'set,' and the API returns booleans, never values. When the engine runs, the vault's secrets are injected transiently into that child process's environment for the life of that run and never persisted.</p><div class="g-caveat">If you save credentials while the vault is LOCKED, the app falls back to writing weaker Windows user environment variables — unlock first so keys go into the encrypted vault.</div><div class="g-caveat">The unattended Task Scheduler path can't unlock the vault, so for automated trading its keys must live in environment variables — a stated tradeoff. For vault-only storage, run cycles manually.</div></div><div class="g-sec"><h3 class="g-sec-h">Market data: free by design</h3><p class="g-p">Dawnstar buys no market-data subscription. Every price series it backtests and trades on is pulled from public endpoints, most with no key at all: equities/ETFs from Yahoo Finance (split/dividend-adjusted), crypto from Coinbase public market data, forex from OANDA (using your own token), and short-term interest rates for the FX carry signal from the U.S. Federal Reserve's FRED. Everything downloads into plain CSV files (date,open,high,low,close,volume) that the C++ backtester reads, organized by asset class into separate folders. Inside the Portfolio view's Live Execution panel, a one-button 'Refresh Free Data' pulls the whole cross-asset universe at once (Yahoo ETFs + Coinbase crypto + OANDA FX) in-process — no Alpaca key and no separate Python needed.</p><dl class="g-details"><dt>Equities / ETFs</dt><dd>Yahoo Finance — public, no key, split/dividend-adjusted</dd><dt>Crypto</dt><dd>Coinbase public market data — no key</dd><dt>Forex</dt><dd>OANDA daily candles — uses your OANDA token</dd><dt>Interest rates</dt><dd>FRED — free read-only key, for the carry signal</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Optional data keys (free, read-only) and the survivorship caveat</h3><p class="g-p">Under Settings, an 'Optional data sources' group offers four free, read-only keys that only widen breadth or improve data quality and NEVER touch trading: CryptoCompare (deep/full daily crypto history — the highest-value one, since it makes the crypto sleeve statistically honest instead of bull-market-flattered), Tiingo (cleaner adjusted-close equities), CoinGecko (crypto aggregator), and FRED (macro/rates). They are sealed in the vault and never displayed back. The single biggest data caveat: the free fetchers pull only CURRENTLY-listed products, so crypto (and single-stock) backtests are survivorship-biased and optimistic — delisted names are absent, which flatters the record. Adding CryptoCompare's deep history is the honest fix: with ~9 years including the 2018 and 2022 crashes, the crypto sleeve's Sharpe corrected DOWN from a bull-flattered ~0.75 to a more trustworthy 0.56 (t-stat 1.99). More data made the number smaller but more believable.</p><div class="g-caveat">None of the optional data keys can trade or move money — they are read-only market/economic data only; only broker keys can trade.</div><div class="g-caveat">Survivorship bias: only currently-listed products are fetched, so crypto and single-name results are OPTIMISTIC. Size those sleeves small.</div><div class="g-caveat">Skipping all four keys still gives you a fully working, PROVEN portfolio; they are refinements, not requirements.</div></div></article><article class="g-chapter" id="portfolios"><div class="g-ch-head"><span class="g-ch-num">4</span><h2 class="g-ch-title">The Portfolio Options: Sleeves, Tiers &amp; the Honest Numbers</h2></div><p class="g-intro">Dawnstar's core insight is that no single signal is strong enough to trust — the honest edge comes from combining several genuinely uncorrelated 'sleeves,' sized by risk-parity, and judging the combined stream through one strict statistical gate. The Portfolio view offers three prebuilt books.</p><div class="g-sec"><h3 class="g-sec-h">The big idea: sleeves and breadth</h3><p class="g-p">A 'sleeve' is one strategy run on one asset class — for example 'equity trend on 9 sector ETFs' or 'FX carry on 10 currency pairs.' On its own, every sleeve is weak (standalone sleeve Sharpes run roughly 0.38–0.55 in the original equity/FX study, and some — like FX-trend at −0.40 — are outright negative alone). The app's whole thesis is that combining several sleeves that move independently produces a stronger combined result than any one of them, because portfolio Sharpe = single-sleeve Sharpe × √(number of uncorrelated sleeves). Each portfolio is just a named bundle of sleeves; the engine runs each as its own backtest, then risk-parity-combines them (weighting each by the inverse of its recent volatility, with no look-ahead) and scores the single combined return stream. The correlation matrix the app shows is the evidence — low, near-zero correlations mean the bets are genuinely independent (Dawnstar's sleeves average ~0.085 pairwise).</p><dl class="g-details"><dt>Where to find it</dt><dd>Left nav → 'Portfolio'; the view is titled 'Diversified Portfolio'</dd><dt>How a sleeve is weighted</dt><dd>Risk-parity: inverse of each sleeve's trailing 63-day volatility, recomputed per date, no look-ahead</dd><dt>Why it works</dt><dd>Uncorrelated sleeves (avg pairwise correlation ~0.085) — low correlation is the whole point</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Global Diversified — the recommended portfolio</h3><p class="g-p">This is the portfolio Dawnstar recommends: a cross-asset managed-futures book. Its six sleeves are multi_trend (trend across 32 cross-asset ETFs, long/flat), multi_lowvol (low-vol on the same 32 ETFs, long-only), commod_trend (trend on 8 commodity ETFs, can short), rates_trend (trend on 8 bond/credit ETFs, can short), fx_carry (carry on 10 FX pairs using G10 rates), and crypto_lowvol (low-vol crypto, long-only). Commodities and rates are the real diversifiers — slightly negatively correlated to stocks — which is what lifts the deflated Sharpe. Measured on business-day-resampled returns at the honest trial count N=120 over 19.6 years, it scores Sharpe 0.75, t-stat 3.31, with 100% of cross-validation (CPCV) folds positive — earning the top PROVEN (Tier A) verdict, and it holds PROVEN even under a harsh N=500 trial charge. With a free CryptoCompare key the crypto sleeve uses ~9–16 years of deep history; without one it falls back to the ~4-year Coinbase set (still PROVEN, modestly lower).</p><dl class="g-details"><dt>Sleeves (6)</dt><dd>multi_trend, multi_lowvol, commod_trend, rates_trend, fx_carry, crypto_lowvol</dd><dt>Combined Sharpe / t-stat</dt><dd>0.75 / 3.31</dd><dt>Horizon / trial count</dt><dd>19.6 years / N=120 (business-day resampled)</dd><dt>Verdict</dt><dd>PROVEN (Tier A) — stays PROVEN even at N=500</dd></dl><div class="g-caveat">PROVEN here means statistically proven on a HISTORICAL backtest whose sleeves were chosen with hindsight. There is no live track record, so the correct operating stance is still Tier B: deploy small, paper-track 6–18 months, scale only on forward confirmation.</div><div class="g-caveat">An earlier headline of Sharpe 0.80 / t-stat 4.05 was a weekend-crypto annualization artifact and is SUPERSEDED — the honest current number is 0.75 / t 3.31.</div></div><div class="g-sec"><h3 class="g-sec-h">Diversified Core — the simpler alternative</h3><p class="g-p">This was the recommended portfolio before the cross-asset expansion, kept as a simpler option. It has four sleeves: eq_trend (trend on 9 survivorship-free sector ETFs — XLB, XLE, XLF, XLI, XLK, XLP, XLU, XLV, XLY), eq_meanrev (mean-reversion on those same 9 sectors), fx_carry (carry on 10 FX pairs), and crypto_lowvol (low-vol crypto on the ~4-year Coinbase set). The app describes it as 'the honest best portfolio: genuinely uncorrelated, mostly survivorship-free sleeves.' Measured at N=120, it scores Sharpe 0.52, t-stat 2.36 over 20.3 years — a real, robust result that simply hasn't cleared the 3-sigma bar, so it rates PROMISING (Tier B). The app's guidance for PROMISING is 'deploy small, paper-track, then scale.'</p><dl class="g-details"><dt>Sleeves (4)</dt><dd>eq_trend, eq_meanrev, fx_carry, crypto_lowvol</dd><dt>Combined Sharpe / t-stat</dt><dd>0.52 / 2.36</dd><dt>Horizon / verdict</dt><dd>20.3 years / PROMISING (Tier B)</dd></dl><div class="g-caveat">An older headline of Sharpe 0.60 / t-stat 3.03 labeled 'PROVEN' was the weekend-inflated pre-fix reading and is SUPERSEDED. The honest current verdict is PROMISING, not PROVEN.</div></div><div class="g-sec"><h3 class="g-sec-h">Live Core — the book actually wired for live trading</h3><p class="g-p">This is the portfolio designed for live reconciliation. It deliberately holds exactly one STATELESS sleeve per broker venue: multi_trend (32 cross-asset ETFs via Alpaca, long/flat), fx_carry (10 FX pairs via OANDA), and crypto_lowvol (crypto via Coinbase, long-only). Mean-reversion is excluded because it is 'stateful' — its target depends on entry history and doesn't cleanly reconcile to a daily live target the way a stateless sleeve does. Each Live Core sleeve has a clean daily target that matches its backtest, which is what makes safe live reconciliation possible. Measured at N=120, it scores Sharpe 0.48, t-stat 2.07 over 18.8 years — PROMISING (Tier B). This is the book the Live Execution panel scores to decide how much (if any) real risk to take.</p><dl class="g-details"><dt>Sleeves (3)</dt><dd>multi_trend (Alpaca) · fx_carry (OANDA) · crypto_lowvol (Coinbase)</dd><dt>Combined Sharpe / t-stat</dt><dd>0.48 / 2.07</dd><dt>Horizon / verdict</dt><dd>18.8 years / PROMISING (Tier B)</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">How to run a portfolio</h3><p class="g-p">Building and scoring a portfolio is read-only — it places no orders and touches no money. Pick a portfolio, optionally set the trial count N (default 120), and click 'Build &amp; Score Portfolio.' The app runs each sleeve through the engine, risk-parity-combines them, and scores the combined stream through the tiered gate. Read the results: a 'Combined Result' panel with a tier badge (PROVEN / PROMISING / INSUFFICIENT / REJECT) and a plain-English action line; a 'Sleeves' panel listing each sleeve's Sharpe, day count, and data-quality note; and a 'Correlation Matrix' proving the diversification is real (low/negative is good). If underlying price data hasn't been downloaded, the run fails with a message telling you to fetch bars first — use 'Refresh Free Data' in the Live Execution panel.</p><ol class="g-steps"><li>Open the 'Portfolio' view in the left nav.</li><li>Pick a portfolio (Global Diversified is recommended).</li><li>Optionally adjust 'Trial count N' (default 120).</li><li>Click 'Build &amp; Score Portfolio' and wait for the run.</li><li>Read the tier badge + action line, the Sleeves table, and the Correlation Matrix.</li><li>If it fails for missing data, click 'Refresh Free Data,' then retry.</li></ol></div><div class="g-sec"><h3 class="g-sec-h">The honesty that travels with every portfolio</h3><p class="g-p">The most important thing to understand: a PROVEN backtest is not a green light to bet the farm. Every result here is a historical backtest, and the sleeve selection used hindsight over the same decades of data (for example, a losing FX-trend sleeve was excluded on an economic argument — defensible, but still a hindsight choice). There is zero live track record. So the correct operating stance for ALL of them, even Global Diversified, is Tier B: deploy small, paper-track 6–18 months, and scale only if live performance tracks the backtest. The app builds this discipline into the machinery — the validation tier is literally the risk dial for live sizing. Higher-Sharpe variants do exist, but only by loading survivorship-biased, ~0.89-market-correlated equity-factor sleeves; that extra 'return' is mostly disguised stock-market beta, which Dawnstar deliberately does not chase.</p><div class="g-caveat">Do not cite the superseded pre-fix headlines anywhere (Global 0.80/t4.05, Core 0.60/t3.03 'PROVEN'). The honest current numbers are Global 0.75/t3.31 PROVEN, Core 0.52/t2.36 PROMISING, Live Core 0.48/t2.07 PROMISING.</div><div class="g-caveat">Nothing is at full live size on a backtest alone; the two live-trading gates are OFF by default.</div></div></article><article class="g-chapter" id="backtest-lab"><div class="g-ch-head"><span class="g-ch-num">5</span><h2 class="g-ch-title">The Backtest Lab &amp; Strategies</h2></div><p class="g-intro">The Backtest lab lets you replay any of seven systematic strategies against years of historical daily bars, then judges whether the result is real or curve-fitting. Every backtest runs the exact same strategy code the live engine trades, fills next-day-open with adverse slippage, and shows a buy-and-hold benchmark beside it.</p><div class="g-sec"><h3 class="g-sec-h">The Strategy Backtest view</h3><p class="g-p">Click the Backtest item in the left nav to open the 'Strategy Backtest' screen: a form at the top, a status line showing which symbols you have downloaded, and (after a run) two result panels — the 'Anti-Overfitting Scorecard' and a 'Results' table comparing your strategy to buy-and-hold. Fill in the form, click 'Run Backtest,' and a few seconds later the numbers appear. Behind the scenes the app just runs the C++ engine (backtest.exe) with command-line flags built from your choices, then parses its printout back into the screen — so everything the GUI does, the command line can do too.</p><dl class="g-details"><dt>Strategy dropdown</dt><dd>7 choices: Mean-Reversion (equities), Trend, Carry (FX), Blend, Momentum, Value, Low-Vol</dd><dt>Market data dropdown</dt><dd>bars_multi, bars_eq, bars_fx, bars_crypto, bars_crypto_wide, bars (legacy sample)</dd><dt>Trials N</dt><dd>how many variants you searched program-wide; raises the honesty penalty (default 1)</dd><dt>Toggles</dt><dd>Parameter sweep, Walk-forward, Monte Carlo (on by default), Trend gate, CPCV + Validation Gate, Allow short, Vol target</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">The seven strategies, in plain English</h3><p class="g-p">Trend is the unified core: applied to each instrument's OWN price, it measures whether price is above its level 3, 6, and 12 months ago (63/126/252 trading days), averages the three votes, and goes long when the trend is up, flat when down. Those lookbacks are FIXED and averaged as an ensemble on purpose — there is deliberately no 'best window' to tune, because picking one invites overfitting. Mean-Reversion is the equities-only 'buy the dip' sleeve: buy when the close is more than Buy% below its N-day moving average, sell when more than Sell% above, with a hard Stop% below entry — it has real knobs, so it is the only strategy the sweep and walk-forward can optimize. The other four are cross-sectional 'rank the universe, long the top third, short the bottom third' books: Carry ranks currencies by interest-rate differential; Momentum by 12-month return; Value by a ~5-year reversion proxy (long the cheap); Low-Vol by inverse trailing 126-day volatility (long the calm); and Blend combines equal-weighted z-scores of Carry+Value+Momentum, the single strongest diversifier because value and momentum are negatively correlated.</p><dl class="g-details"><dt>Trend</dt><dd>time-series momentum, ensemble sign of 63/126/252-day returns, long/flat; no sweep to run</dd><dt>Mean-Reversion</dt><dd>SMA 20d, buy 5% below / sell 5% above, 3% stop; equities only; the one sweepable strategy</dd><dt>Carry / Blend</dt><dd>FX cross-sectional, long/short; require a G10 rate table; model FX financing</dd><dt>Momentum / Value / Low-Vol</dt><dd>cross-sectional, price-only, monthly rebalance, long top / short bottom tercile</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">The anti-cheating fill rules</h3><p class="g-p">Four classic backtest lies are engineered out. (1) No look-ahead: a signal computed on day t's CLOSE fills at day t+1's OPEN — a --selftest mode proves this mechanically, and the build script runs it after every compile and aborts with 'do not trust results' if it fails. (2) Costs: adverse slippage (default 5 basis points) is applied against you on every fill, plus an optional per-order commission (default $0, matching Alpaca) — zero-cost backtests flatter dip-buying enormously, so this matters. (3) Adjusted data: the engine expects split/dividend-adjusted bars and warns on any &gt;40% one-day move suggesting an unadjusted split. (4) Honest annualization: it only computes a CAGR when there are at least ~63 trading days, otherwise reporting the raw period return rather than inflating a short run.</p><div class="g-caveat">Daily bars only: intraday fills, gaps through stops, and halts are NOT modeled; a stop 'fills' at the next open even if price gapped far through it — stress-test with Slippage bps 10 or 20.</div><div class="g-caveat">Per-day FX financing is only modeled for the Carry and Blend sleeves (which auto-enable it), so a short-heavy FX trend run is slightly optimistic.</div><div class="g-caveat">The live engine additionally caps each entry at a percent of equity and 25% total exposure; signals are identical to the backtest, but deployed dollars per signal may differ.</div></div><div class="g-sec"><h3 class="g-sec-h">The benchmark and results table</h3><p class="g-p">Every single-run backtest prints two lines: your strategy and an equal-weight buy-and-hold of the SAME symbols over the SAME window with the SAME costs — the app computes the benchmark for you. The Results panel shows a verdict pill ('Strategy Sharpe beats buy &amp; hold' or 'Buy &amp; hold wins') and a table with Return, CAGR, Max DD, Sharpe, Sortino, PF (profit factor), Win %, Trades, and Exposure %. The question the tool answers: does the strategy beat buy-and-hold AFTER costs, with less or comparable drawdown? If not, running it live is paying slippage to underperform. A per-calendar-year regime table also prints, so an edge concentrated in one lucky bull year can't hide inside a single full-sample number.</p><ol class="g-steps"><li>Fetch adjusted history first (needs broker keys for some sources).</li><li>Pick a strategy and a market data set, set symbols and slippage.</li><li>Leave Monte Carlo on; optionally turn on CPCV + Validation Gate for a PROVEN/PROMISING/REJECT verdict.</li><li>Click Run Backtest and read the strategy row against the BUY&amp;HOLD row.</li><li>Only consider a strategy that beats buy-and-hold after costs AND survives the rigor scorecard.</li></ol></div><div class="g-sec"><h3 class="g-sec-h">Trial-count honesty and the sealed lock-box</h3><p class="g-p">The trial count N is the most-omitted number in the industry and the one every deflation, haircut, and Minimum-Backtest-Length calculation depends on, so Dawnstar makes it first-class. The 'Trials N' box tells the gate how many strategies and variants you searched program-wide — try a hundred things and keep the best, and the bar rises accordingly. Beyond that manual number, the command line offers a persistent anti-p-hacking layer: a strategy-trial registry that logs each hypothesis BEFORE you see results and charges the gate the cumulative count of every variant ever tried, and a sealed lock-box (reserve the final slice of history unseen, spend it exactly once) that flags itself 'BURNED' if you evaluate the same tag twice — because a second peek is no longer an honest out-of-sample test.</p><dl class="g-details"><dt>Backtest view 'Trials N' default</dt><dd>1</dd><dt>Portfolio view 'Trial count N' default</dt><dd>120</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Where the honest headline number comes from</h3><p class="g-p">The recommended real portfolio is not a single strategy but a COMBINATION of sleeves, scored as one return stream. The engine can export each sleeve's daily returns, combine them, and re-score the combined stream through the identical rigor gate. On business-day-resampled returns over 19.6 years, the recommended Global Diversified portfolio scores an annualized Sharpe of 0.75 with a t-stat of 3.31 and rates PROVEN (Tier A), holding PROVEN even at N=500. The two lighter portfolios rate PROMISING (Tier B): Diversified Core at 0.52 / t 2.36, and Live Core at 0.48 / t 2.07. When scoring a crypto-inclusive stream the engine deliberately drops weekend rows and measures only business days, so the 24/7 crypto sleeve can't pad the record with weekend P&amp;L and inflate the Sharpe.</p><div class="g-caveat">An earlier headline of Sharpe 0.80 / t-stat 4.05 (with Core 0.60 / t 3.03 'PROVEN') was an annualization artifact and is superseded — never cite those old numbers as current.</div><div class="g-caveat">Even a PROVEN backtest has NO live track record and used hindsight-selected sleeves, so the correct operating stance is Tier B: deploy small, paper-track 6–18 months, scale only on forward confirmation.</div></div><div class="g-sec"><h3 class="g-sec-h">The Skeptic and honest limits</h3><p class="g-p">After a run you can click 'Consult the Skeptic' on the scorecard — an adversarial AI critic (an offline heuristic that works without any key, or an optional LLM if you supply your own Anthropic key) whose only power is to LOWER your confidence in a strategy's rigor numbers. It can never green-light a strategy, never places or vetoes a trade, and never touches the trading engine. Read every backtest with humility: results use free-plan daily data (fine for daily-bar evaluation, not microstructure); your symbol list is today's survivors, so there is survivorship bias; and past performance never guarantees future results. A clean out-of-sample pass raises the odds you have something — it guarantees nothing, which is exactly why weeks of measured paper trading stay in the pipeline even after a good backtest.</p><div class="g-caveat">'No edge found' is a valid, money-saving result the tool is built to deliver — the honest verdict is the product.</div><div class="g-caveat">Coinbase Advanced Trade is live-only (no sandbox), so crypto paper-simulates unless dual-gated; crypto fees are real (~0.6% maker / 1.2% taker).</div></div></article><article class="g-chapter" id="rigor-engine"><div class="g-ch-head"><span class="g-ch-num">6</span><h2 class="g-ch-title">The Validation / Rigor Engine, in Plain English</h2></div><p class="g-intro">Dawnstar's core differentiator is not a clever signal — it is a set of professional-grade anti-overfitting statistics, wired into the workflow so the app will tell you 'this isn't real' before you fund it. Everything rolls up to one tiered verdict.</p><div class="g-sec"><h3 class="g-sec-h">The single verdict everything rolls up to</h3><p class="g-p">Instead of one impossible pass/fail bar, Dawnstar assigns a TIER, because a literal 3-sigma certainty on a single 10–20-year backtest is mathematically unreachable for any real strategy. INSUFFICIENT means fewer than 30 trades — statistically meaningless, treated as 'can't judge,' not a fail. REJECT (Tier C) falls short on significance and/or out-of-sample robustness — do not deploy real capital. PROMISING (Tier B) is real and robust but not yet 3-sigma proven: net out-of-sample Sharpe positive, a robustness measure passing the 'deploy-small' bar (Probability of Overfitting ≤ 0.50 OR ≥60% of cross-validation folds profitable), a t-stat ≥ 1.64, and at least half the required backtest length — the action is deploy small (10–25% of target risk), paper-track 6–18 months, and scale only if live tracks. PROVEN (Tier A) additionally needs a t-stat ≥ 3.0 (the Harvey-Liu multiple-testing bar), the stricter robustness (Overfitting ≤ 0.20 OR ≥75% of folds positive with a positive 5th-percentile fold), and enough data to clear the Minimum Backtest Length. Crucially, significance is judged on the CONSERVATIVE full-sample Sharpe, never the rosier fold mean.</p><dl class="g-details"><dt>INSUFFICIENT</dt><dd>&lt; 30 trades — gather more data</dd><dt>REJECT (Tier C)</dt><dd>fails significance and/or robustness — no real capital</dd><dt>PROMISING (Tier B)</dt><dd>OOS Sharpe &gt; 0, ≥60% folds + (or PBO ≤ 0.50), t ≥ 1.64, ≥ half MinBTL → deploy small</dd><dt>PROVEN (Tier A)</dt><dd>adds t ≥ 3.0, ≥75% folds + with 5th-pct fold &gt; 0 (or PBO ≤ 0.20), length ≥ MinBTL</dd></dl><div class="g-caveat">The code's own note: even PROVEN means 'not obviously overfit, never will make money. Nothing goes to full size on a backtest alone.'</div></div><div class="g-sec"><h3 class="g-sec-h">The trials count — the most-omitted number in the industry</h3><p class="g-p">The single most important input to the whole engine is N, the number of trials searched. If you try N parameter sets and keep the best, that best Sharpe is the MAXIMUM of N noisy estimates — inflated purely by selection, not real edge. Every deflation, haircut, and length requirement scales with N. You are meant to set N to the honest count of everything you searched program-wide — a strategy that 'passed' but was the 40th thing you tried is vastly weaker evidence than a first-and-only test. Dawnstar even keeps an append-only trial registry so the count stays honest across sessions and you cannot quietly forget your failures. Setting N=1 when you actually tried dozens of things is the classic way to lie to yourself with this tool.</p><dl class="g-details"><dt>Backtest view 'Trials N' default</dt><dd>1</dd><dt>Portfolio view 'Trial count N' default</dt><dd>120</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">The individual checks, in plain English</h3><p class="g-p">The Probabilistic Sharpe Ratio turns 'Sharpe 1.2' into 'X% confident the true Sharpe is above 0,' correcting for how short and skewed your sample is. The Deflated Sharpe Ratio measures that against the Sharpe you'd EXPECT to get by luck alone from N random trials — if your winner isn't clearly above what N coin-flips would produce, you found noise. The Probability of Backtest Overfitting (PBO), computed empirically via CSCV, splits history into 16 blocks and, across all 12,870 ways of choosing 8 for training and 8 for testing, asks how often the in-sample best lands below the median out-of-sample; above 50% means you are fitting noise (on the built-in sample strategy it reads 54%, a coin flip). Combinatorial Purged Cross-Validation (CPCV) is the check for a FIXED rule with no configs to sweep: it holds out every combination of history blocks (with an 'embargo' gap so a straddling position can't leak information) and reports the distribution of out-of-sample Sharpe. Minimum Backtest Length says how many YEARS you'd need so a Sharpe this high couldn't just be the luckiest of N random strategies. The Harvey-Liu haircut reports the raw t-stat and a deflated 'haircut Sharpe' against the ~3.0 bar. Monte Carlo resamples your trade sequence 1,000 times to show the RANGE of outcomes (5th/50th/95th percentile return and drawdown) — size for the p95, not the median. Walk-forward re-optimizes on prior data across (default) 4 folds and reports efficiency (out-of-sample Sharpe ÷ in-sample); near zero is the classic curve-fit signature.</p><dl class="g-details"><dt>Monte Carlo resamples</dt><dd>1,000</dd><dt>PBO / CSCV</dt><dd>16 blocks, all 12,870 = C(16,8) train/test splits; 54% on the sample strategy</dd><dt>Walk-forward folds</dt><dd>4</dd><dt>Harvey-Liu bar</dt><dd>t-stat ≈ 3.0 (stricter than the usual 2.0)</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Anti-p-hacking bookkeeping and cross-strategy control</h3><p class="g-p">Two durable files keep the discipline honest across sessions. The strategy-trial registry is append-only: you log each hypothesis BEFORE touching the data (pre-registration), and the row count is the N the Deflated Sharpe and haircut charge you for. The lock-box is a final hold-out you may evaluate EXACTLY ONCE; touch it twice and it is 'BURNED.' The engine also guards a subtler self-deception — searching many DIFFERENT strategies and reporting the best — with the standard family-wise tests: White's Reality Check, Hansen's SPA, and the Romano-Wolf stepdown, all built on a stationary bootstrap that preserves the serial dependence in returns. This is the machinery that stops the research program from p-hacking its way to a passing strategy.</p><dl class="g-details"><dt>Registry</dt><dd>Append-only; pre-registered hypothesis count = the N charged to the gate</dd><dt>Lock-box</dt><dd>One-shot hold-out; flagged BURNED on a second evaluation</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">How the tier becomes real money (the risk dial)</h3><p class="g-p">The validation tier is not just a report — on the live path it is the master risk dial that scales position sizing. The mapping is enforced in code: REJECT or INSUFFICIENT → everything flat (all cash); PROMISING → 20% of target risk; PROVEN → full target risk (still per-asset capped). The tier the book earns at build time is written to a file the live engine reads, and the engine REFUSES to open or increase exposure below PROMISING (de-risking exits are always allowed). Regeneration is atomic and fail-closed: the tier is held at REJECT until all venue target files compute successfully, and a missing or garbage tier file reads as REJECT. On top of the tier, standard risk-manager caps apply (about 2% per position, 25% gross exposure, a pattern-day-trade guard, a −3% daily-loss halt, and a STOP_TRADING kill switch).</p><dl class="g-details"><dt>PROVEN</dt><dd>full target risk (per-asset capped)</dd><dt>PROMISING</dt><dd>20% of target risk</dd><dt>REJECT / INSUFFICIENT</dt><dd>flat (cash)</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">The honesty stance that must travel with a PROVEN badge</h3><p class="g-p">This is the most important caveat in the whole app: even the PROVEN Global Diversified book is proven only STATISTICALLY, on a historical backtest whose sleeves were chosen with hindsight over the same multi-decade window. There is no live track record. Therefore the correct OPERATING stance stays Tier B regardless of the badge — deploy small, paper-track 6–18 months, and scale only on forward confirmation. The research frames why the bar is so high: the t-stat of a track record is roughly Sharpe times the square root of years, so even Buffett's realized ~0.79 Sharpe needed 15–20 years to become statistically proven — a backtest showing Sharpe 2–3 over 1–2 years is statistically indistinguishable from overfitting. The tier is a risk dial, not a green light.</p><div class="g-caveat">The GUI reads these figures live from the scorer, so what the app shows always equals what the gate measured — no hard-coded marketing numbers.</div><div class="g-caveat">The only real out-of-sample test is the forward one you haven't run yet.</div></div></article><article class="g-chapter" id="execution"><div class="g-ch-head"><span class="g-ch-num">7</span><h2 class="g-ch-title">Paper &amp; Live Execution</h2></div><p class="g-intro">Dawnstar's live/paper execution is a 'target-and-reconcile' engine: the app computes today's per-venue target positions into CSV files, then the C++ pipeline drives your broker accounts to those targets by trading only the difference. It is paper by default and cannot move real money without deliberately arming two gates.</p><div class="g-sec"><h3 class="g-sec-h">What execution actually is: compute targets, then reconcile</h3><p class="g-p">Live execution is a two-stage model, not a fire-and-forget order blaster. Stage 1 (Compute) runs each venue's strategy for TODAY and writes a per-venue target file: how much of each symbol you should be holding right now. Stage 2 (Reconcile) points the C++ pipeline at those files and it drives your broker positions to match — trading only the delta, never re-stacking on top of what's already there. Re-running when already in sync is a no-op. The live book is deliberately simple: exactly one stateless sleeve per venue — equities = multi_trend on Alpaca (long/flat), forex = fx_carry on OANDA (signed units), crypto = crypto_lowvol on Coinbase (long/flat spot). Mean-reversion is excluded because it is stateful and has no clean daily target.</p><dl class="g-details"><dt>Equity target file</dt><dd>state/equity_targets.csv (symbol, notional USD, long/flat)</dd><dt>Forex target file</dt><dd>state/forex_targets.csv (instrument, signed units; 0 = close)</dd><dt>Crypto target file</dt><dd>state/crypto_targets.csv (symbol, notional USD, long/flat)</dd><dt>Tier file</dt><dd>state/portfolio_tier.txt — the earned tier that gates and sizes everything</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Paper by default — nothing moves real money by accident</h3><p class="g-p">Out of the box the engine trades against paper/practice APIs (Alpaca's paper endpoint, OANDA's fxpractice). Live mode requires BOTH of two independent switches, set separately, each armed with its own fresh single-use confirmation nonce — there is no single flag that flips everything to real money. Separately from paper-vs-live, there is DRY-RUN: a dry-run cycle evaluates everything and logs the exact orders it WOULD place but submits nothing and records nothing. Importantly, the GUI's 'Run Dry-Run Cycle' button ALWAYS runs in dry-run — it previews the full reconciliation plan and submits nothing, even on paper. To actually place orders (paper or live) in portfolio mode you run the pipeline with --portfolio without --dry-run.</p><div class="g-caveat">The 'Run Dry-Run Cycle' button is preview-only and submits nothing, even in paper mode — it is not how you place paper orders.</div><div class="g-caveat">Paper-vs-live and dry-run-vs-real are two separate axes: a non-dry cycle still trades PAPER unless the live gates are armed.</div><div class="g-caveat">The paper/live switch is a single global dual-gate applied to all venues at once, not a per-broker toggle.</div></div><div class="g-sec"><h3 class="g-sec-h">The gate stack: four conditions before any live order</h3><p class="g-p">Before any real-money order for a venue, four independent gates must all pass — any one failing keeps that venue in paper or blocks new exposure. (1) The dual live-gate: the environment variable LIVE_TRADING=true AND a file state/I_ACCEPT_LIVE_TRADING_RISK containing exactly 'yes,' both armed in-app behind a fresh single-use nonce. (2) Live broker keys for that venue, injected from the encrypted vault as environment variables the engine reads at runtime, never logged. (3) The validation tier ≥ PROMISING, enforced engine-side for all three venues; below PROMISING the engine refuses new or increasing exposure, though de-risking exits are always allowed, and a missing or garbage tier reads as REJECT (fail-closed). (4) Risk-manager caps: 2% of equity per position, 25% gross exposure, a pattern-day-trader guard under $25k, a −3% daily-loss halt, and the STOP_TRADING kill switch — plus tier-scaled sizing.</p><dl class="g-details"><dt>Gate 1</dt><dd>LIVE_TRADING=true AND state/I_ACCEPT_LIVE_TRADING_RISK == 'yes' (dual, nonce-armed)</dd><dt>Gate 2</dt><dd>Live broker keys for that venue, injected from the vault as env vars</dd><dt>Gate 3</dt><dd>portfolio_tier.txt ≥ PROMISING (entries); exits always allowed; fail-closed to REJECT</dd><dt>Gate 4</dt><dd>Risk caps: 2%/position, 25% gross, −3% daily-loss halt, PDT&lt;$25k, STOP_TRADING</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">The tier is the risk dial (sizing)</h3><p class="g-p">How much the book deploys is driven entirely by the tier the LIVE book earns when you build targets — no performance number is hard-coded. When you click 'Generate Live Targets,' the app re-scores the Live Core book through the identical rigor gate (business-day returns, N=120, CPCV) and reads the tier: REJECT/INSUFFICIENT → 0% (flat, cash); PROMISING → 20% of target risk; PROVEN → 100% (still per-asset capped). The risk budget is split equally across the three venues: capital × fraction / 3. Within a venue, each long name is sized to the venue budget divided by the number of longs, subject to per-name caps: equities 10% of capital, crypto 5%; forex uses signed units hard-clamped to a maximum of 1000 units per pair. Because Live Core measures Sharpe ~0.48 / t ~2.07 = PROMISING, in practice the live book sizes at the 20% fraction, not full size.</p><dl class="g-details"><dt>Risk fractions</dt><dd>PROVEN 1.00 · PROMISING 0.20 · REJECT/INSUFFICIENT 0.0</dd><dt>Per-venue budget</dt><dd>capital × fraction / 3 (equal risk across Alpaca/OANDA/Coinbase)</dd><dt>Per-name caps</dt><dd>Equity 10% · Crypto 5% · Forex 1000 units/pair (fat-finger clamp)</dd><dt>Default capital</dt><dd>$10,000</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">The paper-first procedure</h3><p class="g-p">Everything below runs safely in paper/dry mode; you never touch the live gates to try it. All three buttons live in the Diversified Portfolio tab's 'Live Execution' panel.</p><ol class="g-steps"><li>Open the Diversified Portfolio tab and find 'Live Execution.' Optionally set 'Portfolio capital ($)' (default 10000).</li><li>Click 'Refresh Free Data' first — it pulls ~20 years of the free cross-asset universe in-process (no Alpaca keys needed). The sleeves need this data to compute targets.</li><li>Click 'Generate Live Targets' — the app re-scores Live Core, shows the earned tier and risk fraction (e.g. 'PROMISING → 20% · $666.67 per venue'), displays the per-venue target tables, and writes the CSVs plus portfolio_tier.txt.</li><li>Click 'Run Dry-Run Cycle' — one reconciliation pass that previews the exact orders and SUBMITS NOTHING. Read the full plan in the Activity Log.</li><li>Watch it in paper/practice for weeks-to-months before considering any live gate. A REJECT tier showing 'everything flat (cash)' is the system working as designed.</li></ol><div class="g-caveat">If you see 'could not compute {venue} targets (fetch bars first?)', run 'Refresh Free Data.'</div><div class="g-caveat">On any target-generation failure the app flattens EVERY venue file and holds the tier at REJECT rather than leaving a partial book.</div></div><div class="g-sec"><h3 class="g-sec-h">What the reconciler does per venue</h3><p class="g-p">Equities (Alpaca): before trading it checks the market clock and skips if closed, unreadable, or within 15 minutes of the close (entries blocked near close; exits still allowed). It holds an existing long untouched (never re-stacks), closes any position whose target is flat, and opens a new long only if entries are allowed, the PDT guard permits, the symbol is tradable, and the risk-sized notional is at least $1. Forex (OANDA): computes delta = target units − held units and reconciles the difference; below PROMISING it applies a belt-and-suspenders 'reducing-only' gate — it will only shrink or close a position, never open, increase, or flip. Crypto (Coinbase): it is simulated unless fully live-gated. Reconciliation is idempotent — each action carries a stable intent-id recorded in state/intent_ledger.csv, so re-running a cycle never double-fires.</p><dl class="g-details"><dt>Equity 'target flat'</dt><dd>closes the position (exits bypass entry sizing)</dd><dt>Equity 'already long'</dt><dd>holds — never tops up or re-stacks</dd><dt>Forex reducing-only</dt><dd>below PROMISING, only moves that reduce |position| without flipping run</dd><dt>Near-close guard</dt><dd>equities block new entries with &lt; 15 min to close</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Coinbase is live-only: simulated with fat-finger caps</h3><p class="g-p">Coinbase Advanced Trade has no sandbox, so there is no safe practice endpoint. Dawnstar handles this by paper-SIMULATING crypto: in paper or dry-run mode it logs the plan ('would hold BTC-USD ~ $X') and submits nothing. It sends real crypto orders only when the dual live-gate is armed AND it is not a dry run. Even fully live, every crypto order is bounded by a fat-finger hard cap (COINBASE_MAX_ORDER_USD, default $500) and a price-sanity cross-check: because the USD cap is converted to a coin quantity using the live price, a stale price could defeat it, so the engine pulls recent daily closes and, if the live price is below 0.4× or above 2.5× the recent median, it FAILS CLOSED and skips the order.</p><div class="g-caveat">You cannot 'paper trade' real Coinbase fills — paper mode is a local simulation only.</div><div class="g-caveat">Crypto fees are real and punishing (~0.6% maker / 1.2% taker); the engine models fees and gates on a minimum edge, and crypto history is short (~4y) and survivorship-biased, so size small.</div></div><div class="g-sec"><h3 class="g-sec-h">Going fully live (and why you shouldn't rush it)</h3><p class="g-p">To trade real money in portfolio mode you must arm BOTH gates, each confirmed separately in-app with a fresh single-use nonce: LIVE_TRADING set to true, and the I_ACCEPT_LIVE_TRADING_RISK file written with 'yes.' Arming either requires a server-minted nonce echoed back; disarming is always allowed without one. Even then, the tier must be ≥ PROMISING for new entries, the correct broker keys must be in the vault, and the risk caps still bind — and the GUI's dry-run button still only previews, so a live NON-dry cycle must be run deliberately. The honest operating stance: nothing here has a live track record. The app was never run against the live broker servers by the author, so your first live/paper HTTP round-trip is 'first contact' — validate in paper for weeks first. Instant reversion to paper is deleting the gate file; instant halt is creating the STOP_TRADING file.</p><div class="g-caveat">No demonstrated edge: correct code is not profitable code; validate forward before scaling.</div><div class="g-caveat">Dawnstar is non-custodial — it never holds or moves your funds, uses only your own broker keys, and does not connect to Robinhood.</div></div><div class="g-sec"><h3 class="g-sec-h">The Forward Track Record — the evidence that actually counts</h3><p class="g-p">A PROVEN backtest is a hypothesis, not a result. The Portfolio view's Forward Track Record panel is where that hypothesis meets reality: every portfolio cycle (and the Record Snapshot button) logs your live/paper portfolio value, and the panel computes your realized forward Sharpe and compares it to the backtest the risk was based on. The verdict is deliberately conservative — it reports "Building record" until there are enough days to mean anything, and it will say "Diverging" or "Below backtest" rather than flatter you. This is the single instrument that tells you whether to keep going, and the only honest basis for ever scaling up.</p><ol class="g-steps"><li>Open the Portfolio view — the Forward Track Record panel loads automatically.</li><li>Run paper cycles over time (each logs a snapshot), or click Record Snapshot to capture your current portfolio value now.</li><li>Watch the forward Sharpe vs the backtest Sharpe and the plain-English verdict build over weeks and months.</li><li>Scale only if the forward record confirms the backtest — never on the backtest alone.</li></ol><div class="g-caveat">Forward Sharpe over a short window is extremely noisy, and deposits or withdrawals distort NAV-based returns — keep a clean track period and give it many months.</div><div class="g-caveat">A green backtest with a thin or diverging forward record is a reason to stay small, not to scale.</div></div></article><article class="g-chapter" id="daily-use"><div class="g-ch-head"><span class="g-ch-num">8</span><h2 class="g-ch-title">Every Other Feature &amp; the Day-to-Day Workflow</h2></div><p class="g-intro">Day to day, Dawnstar is a single-window control surface: you unlock the vault, land on a Dashboard, watch read-only account data, run manual cycles or dry runs, score traders, and manage safety controls. Everything defaults to paper, and all broker data is read-only.</p><div class="g-sec"><h3 class="g-sec-h">Layout: sidebar navigation and the top bar</h3><p class="g-p">The left sidebar groups ten screens into Monitor (Dashboard, Positions, Performance), Strategy (Portfolio, Backtest, Trader Scoring), and Accounts (Connections, Funding), plus Activity Log and Settings. The sidebar footer holds daily controls: a red KILL SWITCH, a 'Lock Vault' button, and text lines showing your install path and app version. The top bar shows the current screen title, a mode badge — a green PAPER badge or a red LIVE badge — three status chips (Market, Alpaca, OANDA), and two action buttons, 'Run Cycle' and 'Dry Run.' Chips are grey when a broker has no keys and colored once keys are set; the Market chip reads 'Market Open,' 'Market Closed,' or 'Market —' based on Alpaca's clock. The whole status bar auto-refreshes about every 8 seconds.</p><dl class="g-details"><dt>Screens</dt><dd>Dashboard, Positions, Performance, Portfolio, Backtest, Trader Scoring, Connections, Funding, Activity Log, Settings</dd><dt>Mode badge</dt><dd>PAPER (green) or LIVE (red) — reflects whether both live gates are armed</dd><dt>Auto-refresh</dt><dd>Status + dashboard poll ~8s; Activity Log 2.5s; running cycle 1s</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Dashboard, Positions, and Performance</h3><p class="g-p">The Dashboard is the landing screen: if no broker is connected, a welcome banner reminds you that you're in paper mode with a 'Set Up Accounts →' button. Four live KPI tiles show Equity (Alpaca) with day P&amp;L, Buying Power, NAV (OANDA) with unrealized P&amp;L, and Open FX Trades; a 'Strategy Status' panel shows Mode, Engine built?, Kill-switch, Market open with minutes-to-close, and Scheduler status; and 'Recent Activity' feeds from the intent ledger. Positions shows two read-only tables (Equity from Alpaca, Forex from OANDA) — Dawnstar never modifies positions from here. Performance graphs your real account history with an equity curve, an underwater drawdown chart, and stat tiles (Total Return, Max Drawdown, Sharpe, CAGR) over selectable periods (1W/1M/3M/1Y/All), all drawn as offline SVG. The Sharpe/Sortino math mirrors the same scorer used elsewhere.</p><dl class="g-details"><dt>KPI tiles</dt><dd>Alpaca equity + day P&amp;L, Buying Power + cash, OANDA NAV + unrealized P&amp;L, Open FX trades</dd><dt>Performance sources</dt><dd>Alpaca portfolio-history; OANDA reconstructed from transaction balances</dd></dl><div class="g-caveat">In paper mode these are your paper/practice account numbers — not a real-money track record.</div><div class="g-caveat">A good-looking equity curve here does not imply a proven strategy; there is no demonstrated live edge.</div></div><div class="g-sec"><h3 class="g-sec-h">Records / tax export</h3><p class="g-p">On the Performance screen, 'Export CSV' writes the current source-and-period trade log to state\exports\dawnstar-trades-{source}-{timestamp}.csv (columns: time, symbol, side, qty, units, price, pl), and a toast confirms the row count and path. This is a convenience export for your own records — explicitly NOT an official tax document. Reconcile it against your broker's official 1099 or account statement, which is the authoritative record.</p><ol class="g-steps"><li>Open Performance and pick the source and period to export.</li><li>Click 'Export CSV.'</li><li>Read the toast for the row count and saved path.</li><li>Reconcile the file against your broker's official statement before using it for taxes.</li></ol><div class="g-caveat">Convenience export only — NOT a tax document.</div></div><div class="g-sec"><h3 class="g-sec-h">Trader Scoring</h3><p class="g-p">The Trader Scoring screen ranks traders from a trades CSV using Dawnstar's native scorer (no Python needed). Two inputs: 'Score from CSV' (type a path or leave blank to use state\trades.csv), or 'Pull from Myfxbook' (after entering Myfxbook email/password in Settings, supply comma-separated numeric account IDs and an assumed starting balance). The scorecard shows Trader, Days, Trades, Win %, PF, Max DD %, Sharpe, Sortino, Calmar, Consistency %, a composite Score, a significance badge (INSUFFICIENT / NOT SIGNIFICANT / PRELIMINARY / PLAUSIBLE / SIGNIFICANT), and red-flag chips (short history, PF&lt;1, high DD, suspiciously high win rate). The Myfxbook API returns only the last 50 trades per account and gives no data for watched accounts lacking an explicit ID, so a pull is a recent slice, not a full record — for a full track record, export the trader's CSV from their Myfxbook page and score that.</p><div class="g-caveat">Myfxbook's API caps history at the last 50 trades — a quick look, not a full record.</div><div class="g-caveat">When a starting balance isn't available, drawdown/return percentages depend on the assumed starting balance you enter.</div></div><div class="g-sec"><h3 class="g-sec-h">Activity Log and running cycles manually</h3><p class="g-p">The Activity Log tails the engine's most recent cycle log with color-coded lines (alerts, cycle markers, muted 'no-signal' lines, trades) and auto-refreshes every 2.5 seconds. Two top-bar buttons run the engine on demand: 'Run Cycle' executes a full trading cycle, and 'Dry Run' evaluates signals but places no orders — the safe way to preview intent. Both switch you to the Activity Log and stream the engine's output live, showing 'running…' then 'done (exit 0)' or the exit code. Only one run can be active at a time, and running requires the engine to be built. Even a real 'Run Cycle' only touches real money if BOTH live gates are armed and live keys are present — otherwise it acts on your paper accounts.</p><dl class="g-details"><dt>Run Cycle</dt><dd>Full cycle; streams to Activity Log; one at a time</dd><dt>Dry Run</dt><dd>Evaluates signals, submits nothing (safe preview)</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Kill switch, notifications, and automation</h3><p class="g-p">The red KILL SWITCH button (with a confirm dialog) writes a STOP_TRADING file that both the engine and the scheduled task honor, so the next cycle places no orders regardless of everything else; clicking again clears it. Notifications (Settings → Notifications) alert you on fills, risk halts, rejected orders, backtest-decay warnings, and cycle failures across three channels — in-app toasts, native Windows notifications, and an optional webhook (Discord/Slack/ntfy, stored as a secret); 'Send Test' confirms delivery. The Automation Schedule (Settings → Automation Schedule) installs a Windows scheduled task that runs a cycle every 30 minutes from 08:30 to 15:30 US Central on weekdays, with Install/Enable/Disable/Remove controls; the engine auto-skips closed-market cycles.</p><dl class="g-details"><dt>Kill switch</dt><dd>Writes/removes state\STOP_TRADING; honored by engine and scheduler</dd><dt>Notification channels</dt><dd>In-app toast, native Windows toast, webhook (Discord/Slack/ntfy)</dd><dt>Schedule</dt><dd>Every 30 min, 08:30–15:30 US Central, weekdays; closed-market cycles auto-skipped</dd></dl><div class="g-caveat">Unattended scheduled cycles can't unlock the vault, so they rely on broker keys stored in Windows env vars — less secure than the vault. For maximum key security, skip the task and run cycles manually.</div><div class="g-caveat">The Notifications panel's helper text mentions '(optional) email,' but no email channel is actually implemented — only in-app toast, Windows toast, and webhook fire.</div></div><div class="g-sec"><h3 class="g-sec-h">The AI assistant chat and version/updates</h3><p class="g-p">A docked 'Assistant' launcher opens a chat panel that explains Dawnstar's statistics (Deflated Sharpe, PBO, walk-forward, Monte Carlo), interprets your most recent backtest, and walks you through features. It has strict guardrails baked into its system instructions: it never gives financial advice, never predicts prices, never places/sizes/cancels/times/vetoes a trade or changes a setting, and when discussing a strategy can only argue for more caution — never green-light one. Full conversation requires your own Anthropic API key (Settings → AI Skeptic); without a key it gives honest canned replies and refuses advice questions. The sidebar footer shows the app version (v2.1.0, read from the VERSION file) so you can quote the exact build when reporting an issue — note there is NO in-app auto-updater or 'check for updates' feature; the version display is purely informational.</p><dl class="g-details"><dt>Assistant limits</dt><dd>No advice, no predictions, no trade actions; can only lower confidence</dd><dt>Version display</dt><dd>'Dawnstar v2.1.0' in the sidebar (from the VERSION file)</dd><dt>Auto-update</dt><dd>None — the app does not check for or install updates</dd></dl></div></article><article class="g-chapter" id="honesty-limits"><div class="g-ch-head"><span class="g-ch-num">9</span><h2 class="g-ch-title">Honesty, Limits, Safety &amp; Legal Reality</h2></div><p class="g-intro">Dawnstar publishes its own limitations as loudly as its strengths — that is itself part of the philosophy. This chapter gathers the hard rules to understand before you trust it with any live key.</p><div class="g-sec"><h3 class="g-sec-h">The core stance: no demonstrated edge</h3><p class="g-p">Dawnstar's whole design premise is that most trading software sells a pretty backtest that falls apart on real money, and that the real skill is not fooling yourself. Rather than hide that, the app bakes professional anti-overfitting statistics into the core and shows them plainly — Monte Carlo confidence bands (1,000 resamples), the Deflated Sharpe Ratio, the Probability of Backtest Overfitting via CSCV (across 12,870 splits), walk-forward efficiency, and a plain-English significance verdict on every backtest and scored trader. Fewer than 30 trades is flagged INSUFFICIENT; a dazzling Sharpe on a short record is flagged PRELIMINARY — the exact 'too good, too soon' pattern scam signal-sellers exploit. The stated stance: none of this makes a losing strategy win — that's the point. The app is designed to tell you 'no demonstrated edge' and show the math behind it before you fund a strategy, not after.</p><div class="g-caveat">A green scorecard means 'less likely to be pure overfit,' NOT 'this will make money.'</div><div class="g-caveat">The app will display a NULL / insufficient-evidence verdict rather than manufacture a pass.</div></div><div class="g-sec"><h3 class="g-sec-h">What the numbers mean, and what is superseded</h3><p class="g-p">The recommended Global Diversified portfolio, measured honestly on business-day-resampled returns at N=120 over 19.6 years, scores Sharpe 0.75, t-stat 3.31, with 100% of CPCV folds positive — PROVEN (Tier A), holding even at N=500. Two simpler books rate PROMISING (Tier B): Diversified Core (0.52 / t 2.36, ~20.3 yr) and Live Core (0.48 / t 2.07, ~18.8 yr). Critically, an earlier headline of Sharpe 0.80 / t-stat 4.05 (and Core 0.60 / t 3.03 labeled PROVEN) was an ANNUALIZATION ARTIFACT — the scorer was counting crypto's roughly 1,576 weekend rows as extra trading time, letting weekend crypto P&amp;L inflate the Sharpe. The engine now drops weekend rows so the annualization is consistent; the honest numbers are LOWER, and the old figures are superseded and must never be cited as current. The GUI reads these live from the scorer.</p><dl class="g-details"><dt>Global Diversified</dt><dd>Sharpe 0.75, t-stat 3.31, 19.6 yr, PROVEN (holds at N=500)</dd><dt>Diversified Core</dt><dd>Sharpe 0.52, t-stat 2.36, PROMISING</dd><dt>Live Core</dt><dd>Sharpe 0.48, t-stat 2.07, PROMISING</dd><dt>SUPERSEDED (do not cite)</dt><dd>Old 0.80/t4.05 and Core 0.60/t3.03 'PROVEN' — weekend-inflated pre-fix readings</dd></dl><div class="g-caveat">Higher-Sharpe variants exist only by loading survivorship-biased, ~0.89-market-correlated equity-factor sleeves — mostly disguised stock-market beta, which Dawnstar deliberately does not chase.</div><div class="g-caveat">Crypto data is survivorship-biased (delisted coins absent), another reason to size crypto small.</div></div><div class="g-sec"><h3 class="g-sec-h">The operating rule: PROVEN still means go small</h3><p class="g-p">This is the single most important honesty point. A PROVEN verdict does NOT authorize full-size live trading. Because any backtest — even a statistically strong one — has no live track record and used hindsight-selected sleeves, the correct OPERATING stance stays Tier B: deploy small, paper-track 6–18 months, and scale only if live tracks the (haircut) expectation. The docs state it bluntly: nothing is at full size on a backtest alone. The engine enforces this via the tier-as-risk-dial. And the research explains why the bar is high: even Buffett's realized ~0.79 Sharpe needed 15–20 years to become statistically proven, so a backtest showing Sharpe 2–3 over 1–2 years is statistically indistinguishable from overfitting.</p><ol class="g-steps"><li>Generate live targets and read the earned tier.</li><li>Treat any tier as an instruction to size small first, however good it looks.</li><li>Paper-track the book for 6–18 months against the expected (haircut) performance.</li><li>Scale up ONLY if forward/live results confirm the backtest — never on the backtest alone.</li></ol></div><div class="g-sec"><h3 class="g-sec-h">Non-custodial, and honest broker labels</h3><p class="g-p">Dawnstar is NOT a wallet, bank, money transmitter, or custodian, and it never holds, receives, moves, or has withdrawal access to your funds — a legal and design commitment. Your money stays at the regulated brokers you connect with keys you control and can revoke. The Funding view is non-custodial by design: it shows your allocation and links to each broker's OWN regulated deposit flow, holding nothing. Holding or moving user funds would require FinCEN plus state money-transmitter licensing, and no broker lets a third party deposit into your account anyway. The Connections view labels every integration candidly: Alpaca/OANDA/Coinbase available, SnapTrade/Plaid/Webull roadmap, and Robinhood unsupported (no official API; unofficial ones violate its terms and risk your account).</p><dl class="g-details"><dt>Custody</dt><dd>None — funds stay at your regulated brokers; the app cannot move money out</dd><dt>How money moves</dt><dd>Only orders, via official broker APIs, using YOUR keys</dd><dt>Robinhood</dt><dd>Unsupported — no official API</dd></dl></div><div class="g-sec"><h3 class="g-sec-h">Built-in risk controls and key security</h3><p class="g-p">Every order passes through a risk-manager layer that is the most conservative-by-default part of the system: no more than 2% of equity risked per symbol, a hard halt of all trading for the day at −3% equity, no more than 25% of equity deployed at once, a STOP_TRADING kill switch, and a Pattern-Day-Trader guard that blocks a 4th same-day round-trip on a sub-$25k account. De-risking exits deliberately bypass entry sizing and the exposure cap. The multi-asset engine adds hard per-asset caps the volatility math cannot override (crypto ~5%, equities ~10%, FX effective leverage ~3x vs the 50:1 legal max), and Kelly is used only as an upper-bound sanity check, never to size. Your broker keys live in a single encrypted vault (AES-256-GCM + Argon2id 128 MiB + Windows DPAPI); the master password is never stored and cannot be recovered, and secrets are wiped on lock or after 15 minutes idle.</p><dl class="g-details"><dt>Per-position cap</dt><dd>2% of equity</dd><dt>Daily-loss halt</dt><dd>−3% equity halts trading for the day</dd><dt>Gross exposure cap</dt><dd>25% of equity</dd><dt>Per-asset hard caps</dt><dd>Crypto ~5% · Equities ~10% · FX ~3x effective leverage</dd></dl><div class="g-caveat">The PDT guard first bites the first small LIVE account (paper accounts default to ~$100k), so it can't be caught in paper testing.</div><div class="g-caveat">No master-password recovery exists — record it offline and back up the vault before storing live keys.</div><div class="g-caveat">Ordinary stops do NOT protect across weekend gaps in forex, and symmetric volatility understates crypto tail risk — both flagged explicitly.</div></div><div class="g-sec"><h3 class="g-sec-h">Fees are real, modeled, and punishing on crypto</h3><p class="g-p">The app treats trading costs as a first-class honesty issue. Crypto fees on Coinbase Advanced Trade are the dominant design constraint: the retail base tier is roughly 0.60% maker / 1.20% taker, so a single round trip at retail taker rates costs about 240 basis points before spread and slippage — far more than the effectively-$0 commissions on equities. What the shipping backtester actually charges is adverse slippage (a configurable ~5 bps applied to every fill) plus an optional flat per-order commission (default $0), so backtests are never zero-cost, and every live Coinbase order is bounded by the $500 fat-finger cap plus the price-sanity check. The strategy-design doc additionally lays out the intended cost discipline (per-tier fee modeling, a hard minimum-edge gate, preferring maker orders, and showing gross-vs-net side by side), and quantifies why turnover is lethal: a strategy trading 5x/day does ~1,250 round-trips a year, roughly 62%/year of cost drag even at an optimistic 5 bps — which is why the app stays on a low-turnover daily cadence.</p><div class="g-caveat">The strategy-design doc is explicitly a 'design recommendation, not an edge claim'; per-tier fee modeling, the minimum-edge gate, and a gross-vs-net side-by-side display describe intended design. The verifiable shipped cost handling is the backtester's adverse-slippage + optional-commission model and the live Coinbase fat-finger + price-sanity guardrail.</div></div><div class="g-sec"><h3 class="g-sec-h">Legal reality and honest known gaps</h3><p class="g-p">Before you connect a broker you must read the disclaimer, and the app records your timestamped acceptance at first-run vault creation. The key legal facts: Dawnstar is software, not an investment adviser, broker-dealer, or fiduciary, and nothing it displays is a recommendation; trading can lose all your deployed capital and, in leveraged forex, sometimes more than you deposited; every backtested/simulated result is hypothetical and guarantees nothing; you are in control and responsible for monitoring the software, your positions, and the kill switch; it is non-custodial; and named third parties (Alpaca, OANDA, Coinbase, Myfxbook, Anthropic) are independent and not affiliated with or endorsing Dawnstar. It is MIT-licensed. The published gaps: no demonstrated edge (default parameters are sensible defaults, not fitted or validated); the broker clients were verified against current documented schemas but never run against the brokers' live servers by the author, so your preflight is 'first contact'; the prebuilt exe is unsigned so SmartScreen warns 'unknown publisher' (a .sha256 ships for integrity verification); the Myfxbook pull is capped at the last 50 trades; and there is no auto-updater.</p><dl class="g-details"><dt>Not advice</dt><dd>Not an adviser/broker-dealer/fiduciary; nothing shown is a buy/sell/hold recommendation</dd><dt>Loss risk</dt><dd>Can lose all deployed capital; leveraged forex can lose more than deposited</dd><dt>License</dt><dd>MIT-licensed</dd><dt>First live contact</dt><dd>Broker clients verified vs docs but never run live by the author — your preflight is first contact</dd></dl><div class="g-caveat">Trading others' money is regulated activity and explicitly out of scope — your capital only.</div><div class="g-caveat">You are responsible for complying with all laws, taxes, and every broker/data provider's terms of service.</div><div class="g-caveat">Correct code is not profitable code — the app is a rigorous research-and-execution tool that helps you avoid deceiving yourself, not a money machine, and it will tell you so.</div></div><div class="g-sec"><h3 class="g-sec-h">Two quiet-failure guards: stale data and engine integrity</h3><p class="g-p">Two things can silently corrupt an automated system, so Dawnstar surfaces both. If your market data goes stale (a scheduled refresh failed, or you haven't refreshed in a while) a warning bar appears at the top of the app, and generating live targets is refused outright until you refresh — the app will not trade on a silently-failed data feed. Separately, on every launch Dawnstar verifies the engine binaries against their published SHA-256 in engine/MANIFEST.md; a mismatch (a tampered or wrong-build engine) raises a warning. Both are fail-safe: they make a problem loud rather than letting it ride.</p><dl class="g-details"><dt>Stale-data guard</dt><dd>warns past a few days old; refuses to generate live targets past the block threshold or if a venue's data is missing</dd><dt>Engine integrity</dt><dd>startup SHA-256 check of backtest.exe / pipeline.exe against the manifest</dd></dl></div></article><article class="g-chapter" id="glossary"><div class="g-ch-head"><span class="g-ch-num g-ch-num-alt">&#65290;</span><h2 class="g-ch-title">Glossary — plain-English definitions</h2></div><dl class="g-glossary"><div><dt>Sharpe ratio</dt><dd>A measure of return per unit of risk (volatility). Higher is better, but even great investors sit under ~0.8 over decades — so a backtest boasting 2–3 is a red flag, not a prize.</dd></div><div><dt>t-stat (t-statistic)</dt><dd>How many standard errors a result sits above zero — i.e. how confidently it is distinguishable from luck. Roughly Sharpe times the square root of years of data. Dawnstar treats ~3.0 as the bar for 'proven,' stricter than the usual 2.0.</dd></div><div><dt>PROVEN / PROMISING / REJECT / INSUFFICIENT (tiers)</dt><dd>Dawnstar's four verdicts. INSUFFICIENT = too few trades to judge. REJECT = fails the tests, don't risk money. PROMISING (Tier B) = real but not yet certain, deploy small. PROVEN (Tier A) = statistically strong, but still only on a backtest.</dd></div><div><dt>Tier A / Tier B (operating stance)</dt><dd>Tier A is a statistical badge a backtest can earn. Tier B is how you should actually behave with real money — deploy small, paper-track, scale only on forward confirmation. Dawnstar's rule: operate at Tier B even when the badge says Tier A, because a backtest has no live track record.</dd></div><div><dt>Sleeve</dt><dd>One strategy run on one asset class (e.g. 'trend on commodity ETFs'). Each sleeve is individually weak; the edge comes from combining several that move independently.</dd></div><div><dt>Breadth</dt><dd>Having many genuinely independent bets. Portfolio quality grows with the square root of the number of uncorrelated sleeves — so many modest, unrelated bets beat one clever signal.</dd></div><div><dt>Trend-following (time-series momentum)</dt><dd>Buy what has been going up, stay out of what has been going down, based on each instrument's own recent price. The one mechanism with decades of cross-asset evidence, so it is Dawnstar's core.</dd></div><div><dt>Mean-reversion</dt><dd>'Buy the dip' — buy when price falls well below its recent average, expecting a bounce. Dawnstar uses it only on equities and shelves it when a clear trend exists; never on crypto or FX.</dd></div><div><dt>Carry (FX carry)</dt><dd>Earning the interest-rate difference between two currencies (hold the high-yielder, short the low-yielder). It 'pays slowly and loses quickly,' so Dawnstar sizes it small and tail-aware, not as smooth income.</dd></div><div><dt>Low-vol (low-volatility)</dt><dd>Favoring the calmest instruments, which historically deliver better risk-adjusted returns than the wildest ones.</dd></div><div><dt>Deflated Sharpe Ratio (DSR)</dt><dd>A Sharpe corrected for how many strategies you tried. If you test 100 things and keep the best, the winner looks good by luck alone; DSR asks whether it beats what luck would produce.</dd></div><div><dt>Probability of Backtest Overfitting (PBO)</dt><dd>An empirical estimate (via CSCV) of how often your 'best' in-sample choice turns into a below-average performer out of sample. Above 50% means you are mostly fitting noise. The built-in sample strategy reads 54% — a coin flip.</dd></div><div><dt>CSCV / CPCV (combinatorial purged cross-validation)</dt><dd>Repeatedly splitting history into blocks, training on some and testing on the rest across every combination (with a gap so information can't leak), to see how a rule holds up out of sample rather than on one lucky split.</dd></div><div><dt>Monte Carlo</dt><dd>Reshuffling your trades 1,000 times to see the RANGE of possible outcomes instead of the single path you happened to get. Guidance: size for the unlucky 95th-percentile drawdown, not the median.</dd></div><div><dt>Walk-forward efficiency</dt><dd>How much of a strategy's in-sample performance survives when it is retested on later, untouched data. Near zero means it was curve-fit; above ~50% suggests a robust edge.</dd></div><div><dt>Minimum Backtest Length (MinBTL)</dt><dd>The number of years of history you'd need for a given Sharpe to be trustworthy at your trial count. A backtest shorter than this is flagged as indistinguishable from overfitting.</dd></div><div><dt>Trials (N)</dt><dd>The honest count of every strategy or variant you searched. The more you tried, the higher the bar to call the winner real — the most-omitted number in the industry, which Dawnstar makes first-class.</dd></div><div><dt>Probabilistic Sharpe Ratio (PSR)</dt><dd>The probability that a strategy's true Sharpe is above zero, adjusted for a short or lopsided track record — before the penalty for how many things you tried.</dd></div><div><dt>Kelly sizing</dt><dd>A formula for the mathematically 'optimal' bet size given a known edge. Dawnstar uses it only as a CAP (at most a quarter of it), never a target, because full Kelly over-bets when the edge is uncertain.</dd></div><div><dt>Risk parity</dt><dd>Weighting each sleeve by the inverse of its recent volatility so that calm and wild sleeves contribute roughly equal risk, rather than letting the wildest one dominate.</dd></div><div><dt>Non-custodial</dt><dd>Dawnstar never holds or moves your money. Your funds stay at your brokers; the app only sends orders through their APIs with keys you control.</dd></div><div><dt>Paper trading</dt><dd>Simulated trading against a practice account with fake money — the default mode, used to test everything safely before any real money is at risk.</dd></div><div><dt>Dry run</dt><dd>A cycle that computes and logs the exact orders it WOULD place but submits nothing. The GUI's dry-run button always previews only, even on paper.</dd></div><div><dt>Reconcile / target-and-reconcile</dt><dd>Dawnstar computes today's ideal positions ('targets') then trades only the difference to reach them, rather than stacking new orders on top of what you already hold.</dd></div><div><dt>The two live gates</dt><dd>Two independent switches (an environment flag LIVE_TRADING=true and a signed-off risk-acknowledgement file), both off by default and each armed with a single-use code, that together are required before any real order can be placed.</dd></div><div><dt>Nonce</dt><dd>A fresh, single-use confirmation code the app mints and you echo back to arm a live gate, so a captured code can't be replayed later.</dd></div><div><dt>Kill switch (STOP_TRADING)</dt><dd>An emergency stop — a file the engine and scheduler both honor — that halts all trading immediately, overriding strategy signals, schedules, and gates.</dd></div><div><dt>Argon2id / AES-256-GCM / DPAPI (the vault)</dt><dd>The encryption stack protecting your broker keys: a memory-hard password stretch (Argon2id), authenticated encryption (AES-256-GCM), and a Windows account binding (DPAPI). Same class of design as a local password manager; the master password is unrecoverable by design.</dd></div><div><dt>Survivorship bias</dt><dd>When a dataset includes only the winners that survived to today and silently omits the ones that died, making backtests look better than reality. A big reason Dawnstar sizes crypto and single stocks small.</dd></div><div><dt>Slippage</dt><dd>The gap between the price you expected and the price you actually got. Dawnstar's backtester charges an adverse ~5 basis points on every fill so results are never unrealistically cost-free.</dd></div><div><dt>Maker / taker fees</dt><dd>Exchange fees for adding liquidity (maker, cheaper) versus removing it (taker, dearer). On Coinbase retail these run roughly 0.6% / 1.2%, punishing enough that the engine models them and refuses trades that can't clear their cost.</dd></div><div><dt>PDT (Pattern Day Trader) guard</dt><dd>A US rule that limits accounts under $25,000 to three day-trades in five days. Dawnstar blocks a would-be fourth same-day round-trip (exits still allowed) to keep you compliant.</dd></div><div><dt>Annualization artifact</dt><dd>A measurement bug where a number is scaled up wrongly. Dawnstar's superseded 0.80 Sharpe came from counting crypto's weekend days as extra trading time; fixing it gave the honest, lower 0.75.</dd></div></dl></article></div></div><!--GUIDE_CONTENT_END--></div>
-        </section>
-
-      </div>
-    </main>
-  </div>
-
-  <!-- ===================== AI CHAT (docked to the main window) ===================== -->
-  <button id="chatLauncher" class="chat-launcher" title="Ask Dawnstar's assistant" style="display:none">
-    <svg class="dstar" viewBox="0 0 32 32" width="20" height="20"><path d="M16 1 L18.1 10.9 L26.6 5.4 L21.1 13.9 L31 16 L21.1 18.1 L26.6 26.6 L18.1 21.1 L16 31 L13.9 21.1 L5.4 26.6 L10.9 18.1 L1 16 L10.9 13.9 L5.4 5.4 L13.9 10.9 Z"/></svg>
-    <span>Assistant</span>
-  </button>
-  <div id="chatPanel" class="chat-panel" style="display:none">
-    <div class="chat-head">
-      <div class="chat-title"><svg class="dstar" viewBox="0 0 32 32" width="16" height="16"><path d="M16 1 L18.1 10.9 L26.6 5.4 L21.1 13.9 L31 16 L21.1 18.1 L26.6 26.6 L18.1 21.1 L16 31 L13.9 21.1 L5.4 26.6 L10.9 18.1 L1 16 L10.9 13.9 L5.4 5.4 L13.9 10.9 Z"/></svg> Dawnstar Assistant</div>
-      <div class="chat-head-actions">
-        <button id="chatClear" class="chat-icon-btn" title="Clear conversation">⟲</button>
-        <button id="chatClose" class="chat-icon-btn" title="Close">✕</button>
-      </div>
+      <button class="navtoggle" id="navtoggle" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
-    <div id="chatMessages" class="chat-messages"></div>
-    <div class="chat-disclaimer">Not financial advice. I explain evidence and tools — I never predict markets, place trades, or endorse a strategy.</div>
-    <div class="chat-input-row">
-      <textarea id="chatInput" class="chat-input" rows="1" placeholder="Ask about a statistic, a result, or how something works…"></textarea>
-      <button id="chatSend" class="chat-send" title="Send">➤</button>
+  </header>
+
+  <a id="top"></a>
+
+  <!-- ================= HERO ================= -->
+  <div class="hero wrap">
+    <svg class="heromark" viewBox="0 0 32 32" aria-hidden="true"><use href="#star"/></svg>
+    <div class="eyebrow" style="margin-bottom:20px">Dawnstar Development &amp; Publishing</div>
+    <h1>Automated trading that <span class="g">refuses to let you fool yourself.</span></h1>
+    <p class="sub">Most trading software sells a pretty backtest. Dawnstar is built to do the opposite — bake professional anti-overfitting rigor into the core and show you, plainly, when an “edge” isn’t real. Paper-by-default. Non-custodial. Yours to run.</p>
+    <div class="cta">
+      <a class="btn btn-primary btn-lg" href="#download">↓ Download for Windows</a>
+      <a class="btn btn-ghost btn-lg" href="#honesty">Read our honesty policy</a>
+    </div>
+    <div class="chips">
+      <span class="chip">Paper-trading by <b>default</b></span>
+      <span class="chip">Non-custodial — <b>never holds your money</b></span>
+      <span class="chip dawn">No demonstrated <b>edge</b></span>
+      <span class="chip">Your keys, <b>encrypted &amp; local</b></span>
     </div>
   </div>
 
-  <!-- Toast host -->
-  <div id="toasts" class="toasts"></div>
+  <!-- ================= MISSION ================= -->
+  <section id="mission"><div class="wrap">
+    <div class="mission">
+      <div class="eyebrow">Our mission</div>
+      <blockquote>Give independent traders <span class="g">institutional-grade honesty</span> — the tools to tell a real edge from noise, and the discipline to act only on the difference.</blockquote>
+      <p class="after">The trading-software industry runs on hope: an up-and-to-the-right equity curve, a number with no error bars, a strategy that quietly falls apart the moment real money touches it. Dawnstar Development &amp; Publishing exists to build the counterweight — software that measures its own uncertainty out loud, defaults to safe, and never asks you to trust a claim it can’t show. We would rather tell you “this isn’t real” than sell you a dream.</p>
+    </div>
+  </div></section>
 
-  <!-- Confirm modal -->
-  <div id="modal" class="modal-backdrop" style="display:none">
-    <div class="modal">
-      <h3 id="modalTitle">Confirm</h3>
-      <p id="modalBody"></p>
-      <div class="modal-actions">
-        <button id="modalCancel" class="btn btn-ghost">Cancel</button>
-        <button id="modalOk" class="btn btn-danger">Confirm</button>
+  <!-- ================= HONESTY POLICY ================= -->
+  <section id="honesty"><div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Honesty &amp; integrity policy</div>
+      <h2>Six promises we build into the code — not just the copy.</h2>
+      <p class="lead">These aren’t a marketing stance we can quietly walk back. Each one is enforced by how the software is architected, and every claim on this page is one we can demonstrate.</p>
+    </div>
+    <div class="pledge-grid">
+      <div class="pledge"><div class="n">01</div><h3>We never overstate an edge</h3><p>Dawnstar surfaces the <span class="k">Deflated Sharpe Ratio</span>, the <span class="k">Probability of Backtest Overfitting</span>, walk-forward efficiency and Monte-Carlo bands on every result — even when the honest answer is “this is noise dressed as edge.” The whole system currently has <span class="k">no demonstrated edge</span>, and we say so everywhere it matters.</p></div>
+      <div class="pledge"><div class="n">02</div><h3>Paper-trading by default</h3><p>Out of the box it trades a simulated account. Real money requires <span class="k">two independent, deliberate gates</span> plus your own live broker keys — there is no single switch that flips everything to real money by accident.</p></div>
+      <div class="pledge"><div class="n">03</div><h3>Non-custodial, always</h3><p>Dawnstar is not a wallet, bank, or money transmitter. It <span class="k">never holds, receives, or moves your funds</span>. Your money stays at the regulated brokers you connect; Dawnstar only sends orders through their official APIs with keys you control and can revoke.</p></div>
+      <div class="pledge"><div class="n">04</div><h3>The AI can only add caution</h3><p>The built-in AI is a paid skeptic. Structurally, it <span class="k">cannot touch the trade path</span> — it produces language, never decisions — and it refuses personalized advice or price predictions. It only ever argues for <span class="k">more</span> caution, never less.</p></div>
+      <div class="pledge"><div class="n">05</div><h3>Your keys stay yours</h3><p>Broker credentials are sealed in a local encrypted vault (<span class="k">Argon2id + AES-256-GCM</span>, bound to your Windows account) and never leave your machine. We have no server that could see them, because there is no server.</p></div>
+      <div class="pledge"><div class="n">06</div><h3>Not financial advice</h3><p>Dawnstar is a tool, not an adviser. Nothing it or this site shows is a recommendation to buy or sell anything, and <span class="k">past or backtested results never guarantee future results</span>. You are responsible for every order it places on your behalf.</p></div>
+    </div>
+  </div></section>
+
+  <div class="wrap"><div class="divider"></div></div>
+
+  <!-- ================= PRODUCT ================= -->
+  <section id="product"><div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">What Dawnstar Trading is</div>
+      <h2>A complete, honest automated-trading workstation for your own desktop.</h2>
+      <p class="lead">One native Windows app. It scores strategies with real statistics, connects to your brokers, and can run trading cycles on a schedule — with every safeguard on by default.</p>
+    </div>
+    <div class="features">
+      <div class="feature dawn" id="rigor">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 4 4-8"/></svg></div>
+        <h3>The Rigor Engine</h3>
+        <p>The heart of Dawnstar. Probabilistic &amp; Deflated Sharpe Ratios (Bailey &amp; López de Prado), an empirical Probability of Backtest Overfitting via CSCV, walk-forward efficiency, and Monte-Carlo confidence bands — computed by the same C++ engine that trades live, so results match what actually runs.</p>
+        <div class="tags"><span class="tag">Deflated Sharpe</span><span class="tag">PBO / CSCV</span><span class="tag">Walk-forward</span><span class="tag">Monte Carlo</span></div>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></div>
+        <h3>The AI Skeptic &amp; chat</h3>
+        <p>An advisory-only assistant that critiques your backtests for overfitting and explains the statistics in plain English. It works fully offline as a heuristic, or with your own API key for a written adversarial review. It can only ever lower your confidence — never green-light a trade.</p>
+        <div class="tags"><span class="tag">Advisory only</span><span class="tag">Offline capable</span><span class="tag">Never trades</span></div>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+        <h3>Encrypted vault</h3>
+        <p>Broker keys are stretched with Argon2id and sealed with AES-256-GCM, DPAPI-bound to your Windows account and wiped from memory on lock or idle. One-click backup, and an honest reminder: there is no password recovery, by design.</p>
+        <div class="tags"><span class="tag">Argon2id</span><span class="tag">AES-256-GCM</span><span class="tag">Local only</span></div>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></div>
+        <h3>Broker connections</h3>
+        <p>US equities via Alpaca and forex via OANDA, through their official APIs — paper/practice by default. Coinbase is on the roadmap. We’re candid about limits too: there’s no supported Robinhood integration, because it would mean violating their terms.</p>
+        <div class="tags"><span class="tag">Alpaca</span><span class="tag">OANDA</span><span class="tag">Coinbase (roadmap)</span></div>
+      </div>
+      <div class="feature">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h3>Risk-first execution</h3>
+        <p>Position and exposure caps, a daily-loss halt, a pattern-day-trader guard, an always-available kill switch, and idempotent order handling so a network blip can never double-fire a trade. Exits and de-risking are never blocked.</p>
+        <div class="tags"><span class="tag">Kill switch</span><span class="tag">PDT guard</span><span class="tag">Idempotent</span></div>
+      </div>
+      <div class="feature dawn">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
+        <h3>Backtest = live, one engine</h3>
+        <p>The same code path runs your backtest and your live orders, so there’s no “it worked in the sim” gap. Every shipped binary is inventoried with a published SHA-256, and the build is open and documented — verify what you run.</p>
+        <div class="tags"><span class="tag">One code path</span><span class="tag">Reproducible</span><span class="tag">Hash-verified</span></div>
       </div>
     </div>
-  </div>
+  </div></section>
 
-  <script src="app.js"></script>
+  <!-- ================= PATH TO LIVE ================= -->
+  <section><div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">The path to real money</div>
+      <h2>Deliberately slow, in the order that keeps you safe.</h2>
+      <p class="lead">Dawnstar makes going live take real, conscious steps — because the point isn’t to trade fast, it’s to trade only what you’ve actually validated.</p>
+    </div>
+    <div class="path">
+      <div class="step"><div class="num">1</div><h3>Backtest with rigor</h3><p>Run your strategy and read the scorecard like an allocator — if the Deflated Sharpe and PBO say it’s a curve-fit, stop here.</p><span class="lbl">No money</span></div>
+      <div class="step"><div class="num">2</div><h3>Paper-trade for weeks</h3><p>Watch it run live-shaped on a simulated account. This is the point, not a formality — most strategies fail here.</p><span class="lbl">Simulated</span></div>
+      <div class="step"><div class="num">3</div><h3>Arm gate one</h3><p>Deliberately enable live mode. Nothing happens yet — it’s one of two independent locks, each requiring a fresh confirmation.</p><span class="lbl">Gate 1 of 2</span></div>
+      <div class="step"><div class="num">4</div><h3>Arm gate two + live keys</h3><p>Acknowledge the risk file and supply live broker keys. Only now can real orders be placed — with every risk cap still on.</p><span class="lbl">Real money</span></div>
+    </div>
+  </div></section>
+
+  <!-- ================= DOWNLOAD ================= -->
+  <section id="download"><div class="wrap">
+    <div class="download">
+      <div class="eyebrow" style="color:var(--dawn)">Download</div>
+      <h2>Get Dawnstar Trading for Windows</h2>
+      <p style="max-width:52ch; margin:16px auto 0; color:var(--ink-1)">A single desktop app. Installs alongside its documented engine; your data, keys, and trades stay on your machine.</p>
+      <div class="cta" style="justify-content:center; margin-top:30px">
+        <a class="btn btn-primary btn-lg" id="dlbtn" href="https://github.com/dawnstardev/dawnstar-trading/releases/latest/download/Dawnstar.exe" rel="noopener">↓ Download Dawnstar 2.1.0</a>
+        <a class="btn btn-ghost btn-lg" href="#faq">How to verify &amp; install</a>
+      </div>
+      <div class="dl-meta">
+        <span>Version <b>2.1.0</b></span><span>Windows <b>10 / 11 · 64-bit</b></span><span>~<b>22&nbsp;MB</b></span><span><b>Free</b></span>
+      </div>
+      <div class="dl-note">
+        <b>Honest heads-up:</b> this build isn’t yet signed with a publicly-trusted certificate, so Windows SmartScreen may show an “unknown publisher” notice on first launch. That’s expected for a small independent publisher pre-certificate — not a sign of tampering. Before you run it, verify the download against the published <b>SHA-256</b> (the honest substitute for a signature), then choose “More info → Run anyway.” A publicly-trusted signing certificate is on our roadmap.
+        <span class="hash" id="hash">SHA-256 &nbsp;·&nbsp; published with each release on the download page</span>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- ================= ABOUT + FAQ ================= -->
+  <section id="about"><div class="wrap two">
+    <div>
+      <div class="eyebrow">About the publisher</div>
+      <h2 style="font-size:clamp(26px,3.4vw,36px); margin-top:12px">Dawnstar Development &amp; Publishing</h2>
+      <p style="margin-top:18px; color:var(--ink-1)">We’re an independent software studio building tools for people who’d rather see the truth than a sales pitch. Dawnstar Trading is our flagship — but the standard behind it is the whole company: measure uncertainty out loud, default to safe, hold user data at arm’s length, and never ship a claim we can’t demonstrate.</p>
+      <p style="margin-top:16px; color:var(--ink-1)">“Dawnstar” is the morning star — the light that shows up at the edge of dawn. It’s the promise we build toward: clarity where the rest of the category sells fog.</p>
+      <div class="chips" style="justify-content:flex-start; margin-top:26px">
+        <span class="chip">Independent</span><span class="chip">Privacy-respecting</span><span class="chip dawn">Honesty-first</span>
+      </div>
+    </div>
+    <div class="faq" id="faq">
+      <div class="eyebrow" style="margin-bottom:18px">Straight answers</div>
+      <details open><summary>Will this make me money?</summary><p>We won’t pretend to know. Dawnstar has <strong>no demonstrated edge</strong> — it’s a tool for testing and running strategies honestly, not a promise of profit. Trading carries a real risk of loss. Anyone who guarantees returns is the exact thing this product exists to warn you about.</p></details>
+      <details><summary>Do you ever hold or move my money?</summary><p>Never. Dawnstar is <strong>non-custodial</strong> — not a wallet or money transmitter. Your funds stay at the regulated brokers you connect. It only sends orders through their official APIs using keys you control and can revoke at any time.</p></details>
+      <details><summary>Why does Windows warn about the download?</summary><p>The build isn’t yet signed with a publicly-trusted certificate, so SmartScreen flags an “unknown publisher.” That’s normal for an independent pre-certificate release and doesn’t mean the file is unsafe. Confirm it wasn’t altered by checking its SHA-256 against the value on the release page — in PowerShell: <span class="mono">Get-FileHash .\Dawnstar-Setup.exe -Algorithm SHA256</span> — then choose “More info → Run anyway.” A publicly-trusted certificate is on our roadmap.</p></details>
+      <details><summary>Is my data private?</summary><p>Yes. There is no Dawnstar server. Everything — your keys, strategies, and trade history — lives on your own machine in an encrypted vault. We can’t see it because it never reaches us.</p></details>
+      <details><summary>Which brokers are supported?</summary><p>US equities through <strong>Alpaca</strong> and forex through <strong>OANDA</strong>, paper/practice by default. Coinbase is on the roadmap. Robinhood is not supported, because there’s no official API that would let us do it within their terms — and we won’t pretend otherwise.</p></details>
+      <details><summary>Is this financial advice?</summary><p>No. Dawnstar is software, not an investment adviser, broker-dealer, or fiduciary. Nothing it outputs is a recommendation, and you’re responsible for every order it places. Read the full disclaimer before connecting a broker.</p></details>
+    </div>
+  </div></section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer><div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand" href="#top"><svg class="star" viewBox="0 0 32 32" style="width:24px;height:24px"><use href="#star"/></svg><span><b>DAWNSTAR</b><small>Development &amp; Publishing</small></span></a>
+        <p style="font-size:14px; color:var(--ink-2)">Honest automated trading, built to stop you fooling yourself.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col"><h4>Product</h4><a href="#product">Overview</a><a href="#rigor">Rigor Engine</a><a href="#download">Download</a><a href="#faq">FAQ</a></div>
+        <div class="foot-col"><h4>Company</h4><a href="#mission">Mission</a><a href="#honesty">Honesty policy</a><a href="#about">About</a></div>
+        <div class="foot-col"><h4>Legal</h4><a href="/disclaimer.html">Risk &amp; disclosures</a><a href="/privacy.html">Privacy policy</a><a href="/terms.html">Terms of use</a></div>
+      </div>
+    </div>
+    <p class="legal">
+      <strong>Risk &amp; disclaimer.</strong> Dawnstar Trading is software provided by Dawnstar Development &amp; Publishing. It is <strong>not</strong> an investment adviser, broker-dealer, money transmitter, or fiduciary, and nothing here or in the app is financial, investment, tax, or legal advice or a recommendation to buy or sell any instrument. Automated and discretionary trading both carry a substantial <strong>risk of loss</strong>, potentially all of the capital you deploy. <strong>Past, backtested, simulated, and hypothetical results never guarantee future results</strong>, and no edge is demonstrated. Dawnstar is non-custodial and never holds or moves your funds; your accounts remain at the regulated brokers you connect. You are solely responsible for every order placed on your behalf and for deciding whether to trade at all. Named third parties (Alpaca, OANDA, Coinbase, and others) are independent and not affiliated with or endorsing Dawnstar. Use entirely at your own risk.
+      <br><br>© <span id="yr">2026</span> Dawnstar Development &amp; Publishing. All rights reserved.
+    </p>
+  </div></footer>
+</div>
+
+<script>
+(function(){
+  // year
+  var yr=document.getElementById('yr'); if(yr) yr.textContent=new Date().getFullYear();
+  // mobile nav
+  var t=document.getElementById('navtoggle'), l=document.getElementById('navlinks');
+  if(t&&l){ t.addEventListener('click',function(){ var o=l.classList.toggle('open'); t.setAttribute('aria-expanded',o); });
+    l.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){l.classList.remove('open');t.setAttribute('aria-expanded',false);});}); }
+
+  // starfield — quiet, static unless motion is welcome
+  var c=document.getElementById('stars'); if(!c) return;
+  var ctx=c.getContext('2d'), stars=[], DPR=Math.min(window.devicePixelRatio||1,2), reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function size(){ c.width=innerWidth*DPR; c.height=innerHeight*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); build(); }
+  function build(){ stars=[]; var n=Math.min(150,Math.round(innerWidth*innerHeight/12000));
+    for(var i=0;i<n;i++){ stars.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.3+.2,a:Math.random()*.5+.2,tw:Math.random()*.02+.004,ph:Math.random()*6.28}); } }
+  function frame(ts){ ctx.clearRect(0,0,innerWidth,innerHeight);
+    for(var i=0;i<stars.length;i++){ var s=stars[i]; var al=reduce? s.a : s.a+Math.sin(ts*s.tw+s.ph)*.18;
+      ctx.beginPath(); ctx.fillStyle='rgba(180,205,225,'+Math.max(0,al)+')'; ctx.arc(s.x,s.y,s.r,0,6.283); ctx.fill(); }
+    if(!reduce) requestAnimationFrame(frame); }
+  size(); requestAnimationFrame(frame);
+  var rt; addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(size,200); });
+})();
+</script>
+
 </body>
 </html>
